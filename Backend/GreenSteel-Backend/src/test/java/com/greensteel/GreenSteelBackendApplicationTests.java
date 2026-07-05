@@ -1,0 +1,13 @@
+package com.greensteel;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class GreenSteelBackendApplicationTests {
+
+    @Test
+    void contextLoads() {
+    }
+
+}
