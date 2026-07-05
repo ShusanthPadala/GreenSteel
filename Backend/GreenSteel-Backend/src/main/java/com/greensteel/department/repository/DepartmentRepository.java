@@ -1,5 +1,6 @@
-package com.greensteel.department;
+package com.greensteel.department.repository;
 
+import com.greensteel.department.entity.Department;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,5 +1,7 @@
-package com.greensteel.department;
+package com.greensteel.department.controller;
 
+import com.greensteel.department.entity.Department;
+import com.greensteel.department.service.DepartmentService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

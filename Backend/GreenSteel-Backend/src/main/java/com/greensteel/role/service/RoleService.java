@@ -1,5 +1,7 @@
-package com.greensteel.role;
+package com.greensteel.role.service;
 
+import com.greensteel.role.entity.Role;
+import com.greensteel.role.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
