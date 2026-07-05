@@ -1,7 +1,5 @@
-package com.greensteel.controller;
+package com.greensteel.role;
 
-import com.greensteel.entity.Role;
-import com.greensteel.service.RoleService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

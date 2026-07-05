@@ -1,4 +1,4 @@
-    package com.greensteel.entity;
+    package com.greensteel.role;
 
     import jakarta.persistence.*;
     import lombok.Data;

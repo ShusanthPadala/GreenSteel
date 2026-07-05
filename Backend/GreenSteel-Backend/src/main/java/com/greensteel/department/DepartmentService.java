@@ -1,7 +1,5 @@
-package com.greensteel.service;
+package com.greensteel.department;
 
-import com.greensteel.entity.Department;
-import com.greensteel.repository.DepartmentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
