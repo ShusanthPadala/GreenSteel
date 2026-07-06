@@ -11,8 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -52,7 +51,7 @@ public class User {
 
     @Column(nullable = false)
     private UserStatus status;
-    
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
