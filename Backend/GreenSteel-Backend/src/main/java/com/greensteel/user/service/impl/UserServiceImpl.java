@@ -79,12 +79,23 @@ public class UserServiceImpl implements UserService {
         return userMapper.toResponse(savedUser);
     }
 
-
     @Override
     public UserResponse updateUser(Long id, UpdateUserRequest request) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Email duplicate check
+        if (!user.getEmail().equals(request.getEmail())
+                && userRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateResourceException("Email already exists");
+        }
+
+        // Phone duplicate check
+        if (!user.getPhone().equals(request.getPhone())
+                && userRepository.existsByPhone(request.getPhone())) {
+            throw new DuplicateResourceException("Phone number already exists");
+        }
 
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
@@ -105,6 +116,31 @@ public class UserServiceImpl implements UserService {
         return userMapper.toResponse(updatedUser);
     }
 
+  //  @Override
+  //  public UserResponse updateUser(Long id, UpdateUserRequest request) {
+//
+  //      User user = userRepository.findById(id)
+  //              .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+//
+  //      Department department = departmentRepository.findById(request.getDepartmentId())
+  //              .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
+//
+  //      Role role = roleRepository.findById(request.getRoleId())
+  //              .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
+//
+  //      user.setFirstName(request.getFirstName());
+  //      user.setLastName(request.getLastName());
+  //      user.setEmail(request.getEmail());
+  //      user.setPhone(request.getPhone());
+  //      user.setDepartment(department);
+  //      user.setRole(role);
+  //      user.setStatus(request.getStatus());
+//
+  //      User updatedUser = userRepository.save(user);
+//
+  //      return userMapper.toResponse(updatedUser);
+  //  }
+//
     @Override
     public UserResponse getUserById(Long id) {
 
@@ -132,7 +168,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        userRepository.delete(user);
+        user.setStatus(UserStatus.INACTIVE);
+        userRepository.save(user);
 
     }
 

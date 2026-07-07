@@ -4,16 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="972359a4-ac36-4911-b894-cc42c036aa11" name="Changes" comment="" />
+    <list default="true" id="972359a4-ac36-4911-b894-cc42c036aa11" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Backend/GreenSteel-Backend/src/main/java/com/greensteel/common/response/ApiResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/GreenSteel-Backend/src/main/java/com/greensteel/common/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/GreenSteel-Backend/src/main/java/com/greensteel/common/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/GreenSteel-Backend/src/main/java/com/greensteel/department/entity/Department.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/GreenSteel-Backend/src/main/java/com/greensteel/department/entity/Department.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/GreenSteel-Backend/src/main/java/com/greensteel/user/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/GreenSteel-Backend/src/main/java/com/greensteel/user/controller/UserController.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6,
-  "fromUser": false
-}]]></component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6,
+  &quot;fromUser&quot;: false
+}</component>
   <component name="ProjectId" id="3FrQvtjdmBZjzd1ckDlVIqQJM8P" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -24,8 +32,10 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "S:/Projects/Green Steel",
     "node.js.detected.package.eslint": "true",

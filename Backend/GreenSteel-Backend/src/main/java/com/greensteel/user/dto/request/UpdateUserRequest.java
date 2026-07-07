@@ -13,17 +13,30 @@ import lombok.*;
 @Builder
 public class UpdateUserRequest {
 
-    @NotBlank
-    private String firstName;
+  //  @NotBlank
+  //  private String firstName;
+//
+  //  @NotBlank
+  //  private String lastName;
+//
+  //  @Email
+  //  @NotBlank
+  //  private String email;
+//
+  //  @NotBlank
+  //  private String phone;
+//
+  @NotBlank(message = "First name is required")
+  private String firstName;
 
-    @NotBlank
+    @NotBlank(message = "Last name is required")
     private String lastName;
 
-    @Email
-    @NotBlank
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "Phone number is required")
     private String phone;
 
     private Long departmentId;
