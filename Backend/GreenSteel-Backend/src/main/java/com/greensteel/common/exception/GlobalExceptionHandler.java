@@ -1,7 +1,8 @@
 package com.greensteel.common.exception;
 
 import com.greensteel.common.response.ApiResponse;
-import org.jspecify.annotations.NonNull;
+
+import io.micrometer.common.lang.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -78,7 +79,7 @@ public class GlobalExceptionHandler {
 //
    //     return ResponseEntity.badRequest().body(response);
    // }
-    
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {

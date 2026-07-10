@@ -50,21 +50,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthenticationService authenticationService;
-    
 
-   // @PostMapping("/login")
-   // public ResponseEntity<ApiResponse<LoginResponse>> login(
-   //         @Valid @RequestBody LoginRequest request) {
-//
-   //     LoginResponse response = authenticationService.login(request);
-//
-   //     return ResponseEntity.ok(
-   //             ApiResponse.<LoginResponse>builder()
-   //                     .success(true)
-   //                     .message("Login successful")
-   //                     .data(response)
-   //                     .build()
-   //     );
+
+
         @PostMapping("/login")
         public ResponseEntity<ApiResponse<LoginResponse>> login(
                 @Valid @RequestBody LoginRequest request) {
