@@ -1,12 +1,78 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaLeaf } from "react-icons/fa";
+import api from "../../services/api";
 
 export default function Login() {
 
     const navigate = useNavigate();
 
-    const handleLogin = () => {
-        navigate("/dashboard");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const handleLogin = async () => {
+
+        setError("");
+
+        if (!email || !password) {
+            setError("Please enter email and password.");
+            return;
+        }
+
+        try {
+
+            setLoading(true);
+
+            const response = await api.post("/auth/login", {
+
+                email,
+                password
+
+            });
+
+            const data = response.data;
+
+            localStorage.setItem("token", data.token);
+
+localStorage.setItem(
+    "user",
+    JSON.stringify(data)
+);
+
+            navigate("/dashboard");
+
+        }
+
+        catch (err) {
+
+            console.error(err);
+
+            if (err.response) {
+
+                setError(
+                    err.response.data.message ||
+                    "Invalid email or password."
+                );
+
+            } else {
+
+                setError(
+                    "Unable to connect to the server."
+                );
+
+            }
+
+        }
+
+        finally {
+
+            setLoading(false);
+
+        }
+
     };
 
     return (
@@ -19,11 +85,9 @@ export default function Login() {
 
                 <div className="brand">
 
-                    <FaLeaf className="brand-icon" />
+                    <FaLeaf className="brand-icon"/>
 
-                    <h1>
-                        GreenSteel
-                    </h1>
+                    <h1>GreenSteel</h1>
 
                 </div>
 
@@ -33,29 +97,23 @@ export default function Login() {
                 </h2>
 
                 <p>
+
                     Integrated platform for
                     CO₂, SOx, NOx, PM,
-                    ESG and sustainability
-                    monitoring.
+                    ESG and Sustainability
+                    Monitoring.
+
                 </p>
 
                 <div className="features">
 
-                    <div>
-                        ✓ Carbon Analytics
-                    </div>
+                    <div>✓ Carbon Analytics</div>
 
-                    <div>
-                        ✓ ESG Dashboard
-                    </div>
+                    <div>✓ ESG Dashboard</div>
 
-                    <div>
-                        ✓ AI Prediction
-                    </div>
+                    <div>✓ Emission Monitoring</div>
 
-                    <div>
-                        ✓ Voice Assistant
-                    </div>
+                    <div>✓ Smart Alerts</div>
 
                 </div>
 
@@ -67,28 +125,80 @@ export default function Login() {
 
                 <div className="login-card">
 
-                    <h2>
-                        Welcome Back
-                    </h2>
+                    <h2>Welcome Back</h2>
 
                     <p>
-                        Sign in to continue
+
+                        Login using your
+                        GreenSteel account
+
                     </p>
 
                     <input
+
                         type="email"
+
                         placeholder="Email"
+
+                        value={email}
+
+                        onChange={(e) =>
+                            setEmail(e.target.value)
+                        }
+
                     />
 
                     <input
+
                         type="password"
+
                         placeholder="Password"
+
+                        value={password}
+
+                        onChange={(e) =>
+                            setPassword(e.target.value)
+                        }
+
                     />
 
+                    {
+
+                        error &&
+
+                        <p
+                            style={{
+                                color: "red",
+                                marginTop: "10px",
+                                marginBottom: "0px",
+                                fontSize: "14px"
+                            }}
+                        >
+
+                            {error}
+
+                        </p>
+
+                    }
+
                     <button
+
                         onClick={handleLogin}
+
+                        disabled={loading}
+
                     >
-                        Sign In
+
+                        {
+
+                            loading
+
+                                ? "Signing In..."
+
+                                : "Sign In"
+
+                        }
+
                     </button>
 
                 </div>
