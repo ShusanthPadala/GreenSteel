@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,23 +21,27 @@ public class UserController {
 
     private final UserService userService;
 
-  @PostMapping
-  public ResponseEntity<ApiResponse<UserResponse>> createUser(
-          @Valid @RequestBody CreateUserRequest request) {
+    // Only SUPER_ADMIN can create users
+    @PostMapping
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(
+            @Valid @RequestBody CreateUserRequest request) {
 
-      UserResponse response = userService.createUser(request);
+        UserResponse response = userService.createUser(request);
 
-      return ResponseEntity.status(HttpStatus.CREATED)
-              .body(
-                      ApiResponse.<UserResponse>builder()
-                              .success(true)
-                              .message("User created successfully")
-                              .data(response)
-                              .build()
-              );
-  }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.<UserResponse>builder()
+                                .success(true)
+                                .message("User created successfully")
+                                .data(response)
+                                .build()
+                );
+    }
 
+    // Any logged-in user can view all users
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
 
         List<UserResponse> users = userService.getAllUsers();
@@ -49,7 +54,27 @@ public class UserController {
                         .build()
         );
     }
+
+    // Any logged-in user can view a user
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<UserResponse>> getUserById(
+            @PathVariable("id") Long id) {
+
+        UserResponse response = userService.getUserById(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.<UserResponse>builder()
+                        .success(true)
+                        .message("User fetched successfully")
+                        .data(response)
+                        .build()
+        );
+    }
+
+    // Only SUPER_ADMIN can update users
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable("id") Long id,
             @Valid @RequestBody UpdateUserRequest request) {
@@ -64,8 +89,12 @@ public class UserController {
                         .build()
         );
     }
+
+    // Only SUPER_ADMIN can delete users
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable("id") Long id) {
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(
+            @PathVariable("id") Long id) {
 
         userService.deleteUser(id);
 
@@ -76,49 +105,5 @@ public class UserController {
                         .data(null)
                         .build()
         );
-
-    }
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable("id") Long id) {
-
-        UserResponse response = userService.getUserById(id);
-
-        return ResponseEntity.ok(
-                ApiResponse.<UserResponse>builder()
-                        .success(true)
-                        .message("User fetched successfully")
-                        .data(response)
-                        .build()
-        );
     }
 }
-
-
-
-
-
-
-// @GetMapping
-//public List<UserResponse> getAllUsers() {
-//  return userService.getAllUsers();
-//}
-
-//  @GetMapping("/{id}")
-//  public UserResponse getUserById(@PathVariable Long id) {
-//
-//      return userService.getUserById(id);
-//
-//  }
-//  @PutMapping("/{id}")
-//  public UserResponse updateUser(
-//          @PathVariable Long id,
-//          @Valid @RequestBody UpdateUserRequest request) {
-//
-//      return userService.updateUser(id, request);
-//  }
-//  @DeleteMapping("/{id}")
-//  public void deleteUser(@PathVariable Long id) {
-//
-//      userService.deleteUser(id);
-//
-//  }

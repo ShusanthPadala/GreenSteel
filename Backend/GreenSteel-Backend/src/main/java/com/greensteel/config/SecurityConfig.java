@@ -71,11 +71,23 @@ public class SecurityConfig {
 
                         .requestMatchers("/auth/**").permitAll()
 
-                        //.requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/users/**").permitAll()
 
-                        //.requestMatchers("/roles/**").permitAll()
+                        .requestMatchers("/roles/**").permitAll()
 
-                        //.requestMatchers("/departments/**").permitAll()
+                        .requestMatchers("/departments/**").permitAll()
+
+                        .requestMatchers("/units/**").permitAll()
+
+                        .requestMatchers("/emission-records/**").permitAll()
+
+                        .requestMatchers("/dashboard/**").permitAll()
+
+                        .requestMatchers("/alerts/**").permitAll()
+
+                        .requestMatchers("/reports/**").permitAll()
+
+                        .requestMatchers("/api/esg/**").permitAll()
 
                         .anyRequest().authenticated());
 
