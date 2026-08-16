@@ -1,0 +1,76 @@
+.departments-page{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+}
+
+.department-toolbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.primary-btn{
+
+    background:#748560;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 22px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.primary-btn:hover{
+
+    background:#61714d;
+
+}
+.table-btn{
+
+    border:none;
+
+    padding:8px 16px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    margin-right:10px;
+
+    font-weight:600;
+
+}
+
+.table-btn.edit{
+
+    background:#748560;
+
+    color:white;
+
+}
+
+.table-btn.delete{
+
+    background:#D9534F;
+
+    color:white;
+
+}

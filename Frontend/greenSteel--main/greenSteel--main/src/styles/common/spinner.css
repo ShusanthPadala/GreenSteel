@@ -1,0 +1,55 @@
+.loading-spinner{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    min-height:300px;
+
+    gap:20px;
+
+}
+
+.spinner{
+
+    width:45px;
+
+    height:45px;
+
+    border:4px solid #ECECEC;
+
+    border-top:4px solid #748560;
+
+    border-radius:50%;
+
+    animation:spin .8s linear infinite;
+
+}
+
+@keyframes spin{
+
+    from{
+
+        transform:rotate(0deg);
+
+    }
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+.loading-spinner p{
+
+    color:#777;
+
+    font-weight:500;
+
+}
