@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import authService from "../../services/authService";
+import { getLoginErrorMessage } from "../../utils/apiError";
 import { useState } from "react";
 import {
     FiMail,
@@ -24,12 +25,17 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(true);
     const [loading, setLoading] = useState(false);
-
+    const [error, setError] = useState("");
+    const [info, setInfo] = useState("");
 
     const handleSubmit = async (e) => {
 
         e.preventDefault();
+
+        setError("");
+        setInfo("");
 
         try {
 
@@ -37,26 +43,21 @@ export default function Login() {
 
             const response = await authService.login(email, password);
 
-            if (response.success) {
+            if (response.success && response.data?.token) {
 
-                login(response.data);
+                login(response.data, rememberMe);
 
-                navigate("/dashboard");
+                navigate("/dashboard", { replace: true });
 
             } else {
 
-                alert(response.message);
+                setError(response.message || "Invalid email or password.");
 
             }
 
-        } catch (error) {
+        } catch (err) {
 
-            console.error(error);
-
-            alert(
-                error.response?.data?.message ||
-                "Invalid email or password"
-            );
+            setError(getLoginErrorMessage(err));
 
         } finally {
 
@@ -292,11 +293,27 @@ export default function Login() {
 
                             </div>
 
+                            {error && (
+                                <div className="login-alert login-alert-error" role="alert">
+                                    {error}
+                                </div>
+                            )}
+
+                            {info && (
+                                <div className="login-alert login-alert-info" role="status">
+                                    {info}
+                                </div>
+                            )}
+
                             <div className="options">
 
                                 <label>
 
-                                    <input type="checkbox"/>
+                                    <input
+                                        type="checkbox"
+                                        checked={rememberMe}
+                                        onChange={(e) => setRememberMe(e.target.checked)}
+                                    />
 
                                     Remember me
 
@@ -305,6 +322,12 @@ export default function Login() {
                                 <button
                                     type="button"
                                     className="forgot-btn"
+                                    onClick={() => {
+                                        setError("");
+                                        setInfo(
+                                            "Password reset is not available. There is no backend API for this. Contact an administrator."
+                                        );
+                                    }}
                                 >
 
                                     Forgot Password?

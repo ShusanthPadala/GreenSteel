@@ -1,68 +1,62 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { setUnauthorizedHandler } from "../services/api";
+import { clearAuth, getStoredUser, getToken, saveAuth } from "../utils/authStorage";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+    const navigate = useNavigate();
 
     const [user, setUser] = useState(null);
-
     const [loading, setLoading] = useState(true);
 
+    const logout = useCallback(() => {
+        clearAuth();
+        setUser(null);
+    }, []);
+
     useEffect(() => {
-
-        const token = localStorage.getItem("token");
-
-        const storedUser = localStorage.getItem("user");
+        const token = getToken();
+        const storedUser = getStoredUser();
 
         if (token && storedUser) {
-
-            setUser(JSON.parse(storedUser));
-
+            setUser(storedUser);
+        } else {
+            clearAuth();
+            setUser(null);
         }
 
         setLoading(false);
-
     }, []);
 
-    const login = (userData) => {
+    useEffect(() => {
+        setUnauthorizedHandler(() => {
+            logout();
+            navigate("/", { replace: true });
+        });
 
-        localStorage.setItem("token", userData.token);
+        return () => setUnauthorizedHandler(null);
+    }, [logout, navigate]);
 
-        localStorage.setItem(
-            "user",
-            JSON.stringify(userData)
-        );
-
+    const login = (userData, rememberMe = true) => {
+        saveAuth(userData, rememberMe);
         setUser(userData);
-
-    };
-
-    const logout = () => {
-
-        localStorage.removeItem("token");
-
-        localStorage.removeItem("user");
-
-        setUser(null);
-
     };
 
     return (
-
         <AuthContext.Provider
             value={{
                 user,
                 login,
                 logout,
                 loading,
-                isAuthenticated: !!user,
+                isAuthenticated: !!(user && getToken()),
             }}
         >
             {children}
         </AuthContext.Provider>
-
     );
-
 };
 
 export const useAuth = () => useContext(AuthContext);

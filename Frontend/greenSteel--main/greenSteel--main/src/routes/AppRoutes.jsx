@@ -1,25 +1,25 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import Login from "../pages/Login/Login";
 import Dashboard from "../pages/Dashboard/Dashboard";
+import Departments from "../pages/Departments/Departments";
+import Layout from "../components/layout/Layout";
 
 import ProtectedRoute from "./ProtectedRoute";
-
-import Layout from "../components/layout/Layout";
-import Departments from "../pages/Departments/Departments";
+import GuestRoute from "./GuestRoute";
+import CatchAllRoute from "./CatchAllRoute";
 
 const AppRoutes = () => {
     return (
         <Routes>
-
-            {/* Public Route */}
-
             <Route
                 path="/"
-                element={<Login />}
+                element={
+                    <GuestRoute>
+                        <Login />
+                    </GuestRoute>
+                }
             />
-
-            {/* Protected Routes */}
 
             <Route
                 element={
@@ -28,7 +28,6 @@ const AppRoutes = () => {
                     </ProtectedRoute>
                 }
             >
-
                 <Route
                     path="/dashboard"
                     element={<Dashboard />}
@@ -38,24 +37,12 @@ const AppRoutes = () => {
                     path="/departments"
                     element={<Departments />}
                 />
-
-                {/* Future Pages */}
-
-                {/*
-                <Route path="/users" element={<Users />} />
-                <Route path="/roles" element={<Roles />} />
-                <Route path="/departments" element={<Departments />} />
-                */}
-
             </Route>
-
-            {/* Unknown Route */}
 
             <Route
                 path="*"
-                element={<Navigate to="/" replace />}
+                element={<CatchAllRoute />}
             />
-
         </Routes>
     );
 };
