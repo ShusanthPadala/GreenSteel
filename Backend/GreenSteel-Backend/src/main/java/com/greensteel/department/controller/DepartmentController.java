@@ -1,7 +1,12 @@
 package com.greensteel.department.controller;
 
-import com.greensteel.department.entity.Department;
+import com.greensteel.common.response.ApiResponse;
+import com.greensteel.department.dto.request.DepartmentRequest;
+import com.greensteel.department.dto.response.DepartmentResponse;
 import com.greensteel.department.service.DepartmentService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,49 +14,78 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/departments")
+@RequiredArgsConstructor
 public class DepartmentController {
 
     private final DepartmentService departmentService;
 
-    public DepartmentController(DepartmentService departmentService) {
-        this.departmentService = departmentService;
-    }
-
-    // Only SUPER_ADMIN can create departments
     @PostMapping
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public Department addDepartment(@RequestBody Department department) {
-        return departmentService.addDepartment(department);
+    public ResponseEntity<ApiResponse<DepartmentResponse>> addDepartment(
+            @Valid @RequestBody DepartmentRequest request) {
+
+        return ResponseEntity.ok(
+                ApiResponse.<DepartmentResponse>builder()
+                        .success(true)
+                        .message("Department created successfully")
+                        .data(departmentService.addDepartment(request))
+                        .build()
+        );
     }
 
-    // Any logged-in user can view all departments
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public List<Department> getAllDepartments() {
-        return departmentService.getAllDepartments();
+    public ResponseEntity<ApiResponse<List<DepartmentResponse>>> getAllDepartments() {
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<DepartmentResponse>>builder()
+                        .success(true)
+                        .message("Departments fetched successfully")
+                        .data(departmentService.getAllDepartments())
+                        .build()
+        );
     }
 
-    // Any logged-in user can view a department
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public Department getDepartmentById(@PathVariable Long id) {
-        return departmentService.getDepartmentById(id);
+    public ResponseEntity<ApiResponse<DepartmentResponse>> getDepartmentById(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.<DepartmentResponse>builder()
+                        .success(true)
+                        .message("Department fetched successfully")
+                        .data(departmentService.getDepartmentById(id))
+                        .build()
+        );
     }
 
-    // Only SUPER_ADMIN can update departments
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public Department updateDepartment(
+    public ResponseEntity<ApiResponse<DepartmentResponse>> updateDepartment(
             @PathVariable Long id,
-            @RequestBody Department department) {
+            @Valid @RequestBody DepartmentRequest request) {
 
-        return departmentService.updateDepartment(id, department);
+        return ResponseEntity.ok(
+                ApiResponse.<DepartmentResponse>builder()
+                        .success(true)
+                        .message("Department updated successfully")
+                        .data(departmentService.updateDepartment(id, request))
+                        .build()
+        );
     }
 
-    // Only SUPER_ADMIN can delete departments
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public String deleteDepartment(@PathVariable Long id) {
-        return departmentService.deleteDepartment(id);
+    public ResponseEntity<ApiResponse<String>> deleteDepartment(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
+                        .success(true)
+                        .message("Department deleted successfully")
+                        .data(departmentService.deleteDepartment(id))
+                        .build()
+        );
     }
 }

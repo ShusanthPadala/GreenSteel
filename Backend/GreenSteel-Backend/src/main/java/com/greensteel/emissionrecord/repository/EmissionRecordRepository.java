@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface EmissionRecordRepository extends JpaRepository<EmissionRecord, Long> {
+public interface EmissionRecordRepository
+        extends JpaRepository<EmissionRecord, Long> {
 
     List<EmissionRecord> findByUnitId(Long unitId);
 
@@ -15,9 +16,12 @@ public interface EmissionRecordRepository extends JpaRepository<EmissionRecord, 
 
     List<EmissionRecord> findTop10ByOrderByRecordedAtDesc();
 
+    List<EmissionRecord> findAllByOrderByRecordedAtAsc();
+
     @Query("""
-SELECT AVG(e.healthScore)
-FROM EmissionRecord e
-""")
+        SELECT AVG(e.healthScore)
+        FROM EmissionRecord e
+    """)
     Double getAverageHealthScore();
+
 }

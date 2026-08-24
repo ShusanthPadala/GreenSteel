@@ -1,43 +1,67 @@
 package com.greensteel.department.service;
 
+import com.greensteel.department.dto.request.DepartmentRequest;
+import com.greensteel.department.dto.response.DepartmentResponse;
 import com.greensteel.department.entity.Department;
+import com.greensteel.department.mapper.DepartmentMapper;
 import com.greensteel.department.repository.DepartmentRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
 
-    public DepartmentService(DepartmentRepository departmentRepository) {
-        this.departmentRepository = departmentRepository;
+    public DepartmentResponse addDepartment(DepartmentRequest request) {
+
+        Department department = DepartmentMapper.toEntity(request);
+
+        if (department.getActive() == null) {
+            department.setActive(true);
+        }
+
+        return DepartmentMapper.toResponse(
+                departmentRepository.save(department)
+        );
     }
 
-    public Department addDepartment(Department department) {
-        return departmentRepository.save(department);
+    public List<DepartmentResponse> getAllDepartments() {
+
+        return departmentRepository.findAll()
+                .stream()
+                .map(DepartmentMapper::toResponse)
+                .toList();
     }
 
-    public List<Department> getAllDepartments() {
-        return departmentRepository.findAll();
-    }
-    public Department getDepartmentById(Long id) {
-        return departmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Department not found"));
-    }
-    public Department updateDepartment(Long id, Department updatedDepartment) {
+    public DepartmentResponse getDepartmentById(Long id) {
 
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
-        department.setDepartmentName(updatedDepartment.getDepartmentName());
-        department.setDepartmentCode(updatedDepartment.getDepartmentCode());
-        department.setDescription(updatedDepartment.getDescription());
-        department.setActive(updatedDepartment.getActive());
-
-        return departmentRepository.save(department);
+        return DepartmentMapper.toResponse(department);
     }
+
+    public DepartmentResponse updateDepartment(
+            Long id,
+            DepartmentRequest request) {
+
+        Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Department not found"));
+
+        department.setDepartmentName(request.getDepartmentName());
+        department.setDepartmentCode(request.getDepartmentCode());
+        department.setDescription(request.getDescription());
+        department.setActive(request.getActive());
+
+        return DepartmentMapper.toResponse(
+                departmentRepository.save(department)
+        );
+    }
+
     public String deleteDepartment(Long id) {
 
         Department department = departmentRepository.findById(id)

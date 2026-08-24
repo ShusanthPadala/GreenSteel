@@ -1,9 +1,6 @@
 package com.greensteel.dashboard.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
@@ -13,8 +10,14 @@ public class TrendPointResponse {
 
     private String month;
 
+    private Integer year;
+
     private Double cox;
+
     private Double nox;
+
     private Double sox;
+
     private Double pm;
+
 }

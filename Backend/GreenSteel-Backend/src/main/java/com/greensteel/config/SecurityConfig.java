@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableMethodSecurity
@@ -69,7 +70,6 @@ public class SecurityConfig {
 
         return source;
     }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
@@ -89,21 +89,10 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-
-                        .requestMatchers("/users/**").permitAll()
-                        .requestMatchers("/roles/**").permitAll()
-                        .requestMatchers("/departments/**").permitAll()
-                        .requestMatchers("/units/**").permitAll()
-                        .requestMatchers("/emission-records/**").permitAll()
-                        .requestMatchers("/dashboard/**").permitAll()
-                        .requestMatchers("/alerts/**").permitAll()
-                        .requestMatchers("/reports/**").permitAll()
-                        .requestMatchers("/api/esg/**").permitAll()
-
-                        .anyRequest().authenticated());
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .anyRequest().authenticated()
+                );
 
         return http.build();
     }

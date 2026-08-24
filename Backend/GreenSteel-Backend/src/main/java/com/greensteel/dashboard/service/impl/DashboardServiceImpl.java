@@ -14,9 +14,17 @@ import com.greensteel.unit.repository.UnitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.greensteel.common.enums.UnitStatus;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.time.YearMonth;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -167,70 +175,114 @@ public class DashboardServiceImpl implements DashboardService {
                 records.isEmpty() ? 0 : totalEfficiency / records.size();
 
         return DashboardSummaryResponse.builder()
-                .totalCOx(totalCOx)
-                .totalNOx(totalNOx)
-                .totalSOx(totalSOx)
-                .totalPM(totalPM)
+
+                .averageCOx(
+                        records.isEmpty() ? 0 : totalCOx / records.size()
+                )
+
+                .averageNOx(
+                        records.isEmpty() ? 0 : totalNOx / records.size()
+                )
+
+                .averageSOx(
+                        records.isEmpty() ? 0 : totalSOx / records.size()
+                )
+
+                .averagePM(
+                        records.isEmpty() ? 0 : totalPM / records.size()
+                )
+
                 .esgScore(avgHealth)
+
                 .sustainabilityScore(avgEfficiency)
+
                 .operationalUnits(operational)
+
                 .maintenanceUnits(maintenance)
+
                 .warningUnits(warning)
+
+                .totalUnits(units.size())
+
                 .build();
     }
-    @Override
-    public List<TrendPointResponse> getEmissionTrends() {
 
-        List<TrendPointResponse> trends = new ArrayList<>();
+@Override
+public List<TrendPointResponse> getEmissionTrends() {
 
-        String[] months = {
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun"
-        };
+    List<EmissionRecord> records = emissionRecordRepository.findAll();
 
-        List<EmissionRecord> records =
-                emissionRecordRepository.findAll();
+    Map<YearMonth, List<EmissionRecord>> groupedRecords = new LinkedHashMap<>();
 
-        for (int i = 0; i < months.length; i++) {
+    records.stream()
+            .sorted(Comparator.comparing(EmissionRecord::getRecordedAt))
+            .forEach(record -> {
 
-            if (i < records.size()) {
+                YearMonth key = YearMonth.from(record.getRecordedAt());
 
-                EmissionRecord r = records.get(i);
+                groupedRecords
+                        .computeIfAbsent(key, k -> new ArrayList<>())
+                        .add(record);
 
-                trends.add(
+            });
 
-                        TrendPointResponse.builder()
-                                .month(months[i])
-                                .cox(r.getCox())
-                                .nox(r.getNox())
-                                .sox(r.getSox())
-                                .pm(r.getPm())
-                                .build()
+    List<TrendPointResponse> trends = new ArrayList<>();
 
-                );
+    for (Map.Entry<YearMonth, List<EmissionRecord>> entry : groupedRecords.entrySet()) {
 
-            } else {
+        List<EmissionRecord> monthRecords = entry.getValue();
 
-                trends.add(
+        double avgCOx = monthRecords.stream()
+                .mapToDouble(EmissionRecord::getCox)
+                .average()
+                .orElse(0);
 
-                        TrendPointResponse.builder()
-                                .month(months[i])
-                                .cox(0.0)
-                                .nox(0.0)
-                                .sox(0.0)
-                                .pm(0.0)
-                                .build()
+        double avgNOx = monthRecords.stream()
+                .mapToDouble(EmissionRecord::getNox)
+                .average()
+                .orElse(0);
 
-                );
+        double avgSOx = monthRecords.stream()
+                .mapToDouble(EmissionRecord::getSox)
+                .average()
+                .orElse(0);
 
-            }
+        double avgPM = monthRecords.stream()
+                .mapToDouble(EmissionRecord::getPm)
+                .average()
+                .orElse(0);
 
-        }
+        trends.add(
 
-        return trends;
+                TrendPointResponse.builder()
+
+                        .month(
+
+                                entry.getKey()
+                                        .getMonth()
+                                        .getDisplayName(
+                                                TextStyle.SHORT,
+                                                Locale.ENGLISH
+                                        )
+
+                        )
+
+                        .year(entry.getKey().getYear())
+
+                        .cox(avgCOx)
+
+                        .nox(avgNOx)
+
+                        .sox(avgSOx)
+
+                        .pm(avgPM)
+
+                        .build()
+
+        );
+
     }
+
+    return trends;
+}
 }
