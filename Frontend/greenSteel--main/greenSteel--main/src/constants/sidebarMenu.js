@@ -8,6 +8,7 @@ import {
     MdSettings,
     MdApartment,
     MdCategory,
+    MdPeople,
 } from "react-icons/md";
 
 export const sidebarMenu = [
@@ -59,6 +60,12 @@ export const sidebarMenu = [
     {
         section: "Management",
         items: [
+            {
+                title: "Users",
+                path: "/users",
+                icon: MdPeople,
+                roles: ["SUPER_ADMIN"],
+            },
             {
                 title: "Reports",
                 path: "/reports",

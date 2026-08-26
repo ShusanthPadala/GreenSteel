@@ -1,7 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import authService from "../../services/authService";
-import { getLoginErrorMessage } from "../../utils/apiError";
 import { useState } from "react";
 import {
     FiMail,
@@ -37,32 +35,26 @@ export default function Login() {
         setError("");
         setInfo("");
 
+        const normalizedEmail = email.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+            setError("Invalid email address.");
+            return;
+        }
+        if (!password) {
+            setError("Password is required.");
+            return;
+        }
+
+        setLoading(true);
         try {
-
-            setLoading(true);
-
-            const response = await authService.login(email, password);
-
-            if (response.success && response.data?.token) {
-
-                login(response.data, rememberMe);
-
+            const response = await login(normalizedEmail, password, rememberMe);
+            if (response.success) {
                 navigate("/dashboard", { replace: true });
-
             } else {
-
                 setError(response.message || "Invalid email or password.");
-
             }
-
-        } catch (err) {
-
-            setError(getLoginErrorMessage(err));
-
         } finally {
-
             setLoading(false);
-
         }
 
     };
@@ -250,6 +242,8 @@ export default function Login() {
                                 <input
                                     type="email"
                                     placeholder="Email Address"
+                                    aria-label="Email address"
+                                    autoComplete="email"
                                     value={email}
                                     onChange={(e)=>setEmail(e.target.value)}
                                     required
@@ -268,6 +262,8 @@ export default function Login() {
                                             : "password"
                                     }
                                     placeholder="Password"
+                                    aria-label="Password"
+                                    autoComplete="current-password"
                                     value={password}
                                     onChange={(e)=>setPassword(e.target.value)}
                                     required

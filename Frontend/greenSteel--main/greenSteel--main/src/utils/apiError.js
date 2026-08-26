@@ -40,7 +40,7 @@ export const getLoginErrorMessage = (error) => {
     }
 
     if (status === 401 || status === 403) {
-        return getApiErrorMessage(error, "Invalid email or password.");
+        return "Invalid email or password.";
     }
 
     return getApiErrorMessage(error, "Unable to sign in. Please try again.");

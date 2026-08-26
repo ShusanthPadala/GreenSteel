@@ -1,141 +1,75 @@
-.dashboard-emission-chart{
-
-    background:var(--surface);
-
-    border:1px solid var(--border);
-
-    border-radius:24px;
-
-    padding:24px;
-
-    margin-top:28px;
-
-    box-shadow:var(--shadow-sm);
-
+.dashboard-emission-chart {
+    min-height: 360px;
+    padding: 18px;
+    margin-top: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
 }
 
-.dashboard-emission-chart-header{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:20px;
-
+.dashboard-emission-chart::before {
+    display: block;
+    width: 54px;
+    height: 3px;
+    margin-bottom: 14px;
+    border-radius: 0 0 4px 4px;
+    background: var(--primary);
+    content: "";
 }
 
-.dashboard-emission-chart-header h3{
-
-    font-size:20px;
-
-    color:var(--text-primary);
-
+.dashboard-emission-chart-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
 }
 
-.dashboard-emission-chart-header p{
-
-    color:var(--text-secondary);
-
-    margin-top:4px;
-
-    font-size:14px;
-
+.dashboard-emission-chart-header h3 {
+    color: var(--text-primary);
+    font-family: "Manrope", "Inter", sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
 }
 
-.dashboard-emission-chart-body{
-
-    height:320px;
-
-}
-.dashboard-emission-chart{
-
-    background:white;
-
-    border:1px solid var(--border);
-
-    border-radius:22px;
-
-    padding:24px;
-
-    box-shadow:var(--shadow-sm);
-
-    height:420px;
-
+.dashboard-emission-chart-header p {
+    margin-top: 5px;
+    color: var(--text-secondary);
+    font-size: 13px;
 }
 
-.dashboard-emission-chart-header{
-
-    margin-bottom:22px;
-
+.dashboard-emission-chart-body {
+    height: 280px;
 }
 
-.dashboard-emission-chart-header h3{
-
-    font-size:22px;
-
-    color:var(--text-primary);
-
+.dashboard-emission-chart .dashboard-empty-state {
+    display: grid;
+    min-height: 250px;
+    place-content: center;
+    text-align: center;
 }
 
-.dashboard-emission-chart-header p{
-
-    margin-top:6px;
-
-    color:var(--text-secondary);
-
-    font-size:14px;
-
+.dashboard-emission-chart .dashboard-empty-state h3 {
+    color: var(--text-primary);
+    font-family: "Manrope", "Inter", sans-serif;
+    font-size: 16px;
 }
 
-.dashboard-emission-chart-body{
-
-    height:320px;
-
-}
-.dashboard-emission-chart{
-
-    background:white;
-
-    border:1px solid var(--border);
-
-    border-radius:22px;
-
-    padding:24px;
-
-    box-shadow:var(--shadow-sm);
-
-    height:420px;
-
+.dashboard-emission-chart .dashboard-empty-state p {
+    margin-top: 5px;
+    color: var(--text-secondary);
+    font-size: 13px;
 }
 
-.dashboard-emission-chart-header{
+@media (max-width: 600px) {
+    .dashboard-emission-chart {
+        min-height: 360px;
+        padding: 18px 14px;
+    }
 
-    margin-bottom:22px;
-
-}
-
-.dashboard-emission-chart-header h3{
-
-    font-size:22px;
-
-    color:var(--text-primary);
-
-}
-
-.dashboard-emission-chart-header p{
-
-    margin-top:6px;
-
-    color:var(--text-secondary);
-
-    font-size:14px;
-
-}
-
-.dashboard-emission-chart-body{
-
-    height:320px;
-
+    .dashboard-emission-chart-body {
+        height: 270px;
+    }
 }

@@ -14,25 +14,18 @@ const FormModal = ({
     const [formData, setFormData] = useState({});
 
     useEffect(() => {
-
-        if (initialData) {
-
-            setFormData(initialData);
-
-        } else {
-
-            const emptyForm = {};
-
-            fields.forEach((field) => {
-
-                emptyForm[field.name] = field.defaultValue ?? "";
-
-            });
-
-            setFormData(emptyForm);
-
-        }
-
+        const timer = setTimeout(() => {
+            if (initialData) {
+                setFormData(initialData);
+            } else {
+                const emptyForm = {};
+                fields.forEach((field) => {
+                    emptyForm[field.name] = field.defaultValue ?? "";
+                });
+                setFormData(emptyForm);
+            }
+        }, 0);
+        return () => clearTimeout(timer);
     }, [initialData, fields]);
 
     if (!open) {

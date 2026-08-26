@@ -158,7 +158,7 @@
 
     font-weight:500;
 
-    transition:var(--transition);
+    transition:background-color var(--transition),color var(--transition),transform var(--transition);
 
     margin-bottom:6px;
 
@@ -305,6 +305,7 @@
         transform:translateX(-100%);
 
         transition:.3s;
+        box-shadow:12px 0 30px rgba(20,35,31,.16);
 
     }
 

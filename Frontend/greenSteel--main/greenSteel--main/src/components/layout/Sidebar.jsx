@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { MdFactory, MdLogout } from "react-icons/md";
 
 import { sidebarMenu } from "../../constants/sidebarMenu";
@@ -10,6 +10,7 @@ import "../../styles/sidebar.css";
 const Sidebar = () => {
 
     const { user, logout } = useAuth();
+    const reduceMotion = useReducedMotion();
 
     const navigate = useNavigate();
 
@@ -41,8 +42,9 @@ const Sidebar = () => {
 
                 <motion.div
                     className="sidebar-brand"
-                    initial={{ opacity: 0, y: -20 }}
+                    initial={reduceMotion ? false : { opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: reduceMotion ? 0 : 0.22 }}
                 >
 
                     <div className="sidebar-brand-icon">

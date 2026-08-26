@@ -2,20 +2,20 @@
 
     /* ========= COLORS ========= */
 
-    --primary: #73865B;
-    --primary-hover: #859A68;
+    --primary: #5F7F4F;
+    --primary-hover: #456238;
 
-    --primary-light: #EEF2E7;
+    --primary-light: #EAF2E5;
 
-    --background: #F7F7F2;
+    --background: #F5F7F4;
 
     --surface: #FFFFFF;
 
-    --border: #E8E7DF;
+    --border: #DCE2DD;
 
-    --text-primary: #23261F;
+    --text-primary: #1E2922;
 
-    --text-secondary: #6B7262;
+    --text-secondary: #637067;
 
     --success: #4CAF50;
 
@@ -26,24 +26,24 @@
     /* ========= SHADOWS ========= */
 
     --shadow-sm:
-            0 4px 12px rgba(0,0,0,.04);
+            0 6px 20px rgba(24,43,34,.07);
 
     --shadow-md:
-            0 12px 30px rgba(0,0,0,.07);
+            0 12px 28px rgba(24,43,34,.11);
 
     --shadow-lg:
-            0 20px 45px rgba(0,0,0,.09);
+            0 24px 52px rgba(38,62,45,.14);
 
     /* ========= BORDER ========= */
 
-    --radius-sm:12px;
+    --radius-sm:10px;
 
-    --radius-md:18px;
+    --radius-md:16px;
 
-    --radius-lg:26px;
+    --radius-lg:22px;
 
     /* ========= TRANSITIONS ========= */
 
-    --transition:.28s ease;
+    --transition: 180ms ease;
 
 }

@@ -1,28 +1,26 @@
-import api from "./api";
-
-const BASE_URL = "/departments";
+import api, { unwrapApiResponse } from './api';
 
 export const getDepartments = async () => {
-    const response = await api.get(BASE_URL);
-    return response.data.data;
+  const response = await api.get('/departments');
+  return unwrapApiResponse(response.data);
 };
 
 export const getDepartmentById = async (id) => {
-    const response = await api.get(`${BASE_URL}/${id}`);
-    return response.data.data;
+  const response = await api.get(`/departments/${id}`);
+  return unwrapApiResponse(response.data);
 };
 
-export const createDepartment = async (department) => {
-    const response = await api.post(BASE_URL, department);
-    return response.data.data;
+export const createDepartment = async (data) => {
+  const response = await api.post('/departments', data);
+  return unwrapApiResponse(response.data);
 };
 
-export const updateDepartment = async (id, department) => {
-    const response = await api.put(`${BASE_URL}/${id}`, department);
-    return response.data.data;
+export const updateDepartment = async (id, data) => {
+  const response = await api.put(`/departments/${id}`, data);
+  return unwrapApiResponse(response.data);
 };
 
 export const deleteDepartment = async (id) => {
-    const response = await api.delete(`${BASE_URL}/${id}`);
-    return response.data.message;
+  const response = await api.delete(`/departments/${id}`);
+  return unwrapApiResponse(response.data);
 };

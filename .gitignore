@@ -1,0 +1,32 @@
+# IntelliJ / JetBrains
+.idea/
+*.iml
+
+# Java / Maven
+Backend/GreenSteel-Backend/target/
+
+# Frontend dependencies/build
+Frontend/greenSteel--main/greenSteel--main/node_modules/
+Frontend/greenSteel--main/greenSteel--main/dist/
+
+# Runtime logs
+*.log
+
+# Browser / testing artifacts
+.browser-one/
+forgot-proof/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Local development password reset testing
+Backend/GreenSteel-Backend/src/main/java/com/greensteel/security/DevPasswordResetController.java
+Backend/GreenSteel-Backend/src/main/resources/application-dev.properties
+
+# IntelliJ IDEA
+.idea/
+
+# IntelliJ IDEA
+.idea/
