@@ -3,6 +3,7 @@ package com.greensteel.config;
 import com.greensteel.security.filter.JwtAuthenticationFilter;
 import com.greensteel.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +32,11 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
 
+    // Comma-separated list of frontend URLs allowed to call the API.
+    // Local default; in production set APP_CORS_ORIGINS (e.g. https://greensteel.vercel.app).
+    @Value("${app.cors.allowed-origins:http://localhost:5173}")
+    private String allowedOrigins;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -58,7 +64,12 @@ public class SecurityConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(
+                java.util.Arrays.stream(allowedOrigins.split(","))
+                        .map(String::trim)
+                        .filter(o -> !o.isEmpty())
+                        .map(o -> o.endsWith("/") ? o.substring(0, o.length() - 1) : o)
+                        .toList());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

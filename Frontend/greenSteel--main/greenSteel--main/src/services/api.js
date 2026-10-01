@@ -2,7 +2,8 @@ import axios from 'axios';
 import { clearAuth, getToken } from '../utils/authStorage';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080',
+  // Set VITE_API_URL when deploying (e.g. https://greensteel-api.onrender.com)
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
   headers: {
     'Content-Type': 'application/json',
   },
