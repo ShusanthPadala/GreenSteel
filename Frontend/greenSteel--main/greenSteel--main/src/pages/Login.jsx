@@ -1,15 +1,37 @@
-﻿import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import authService from '../services/authService';
 import { getErrorMessage } from '../services/api';
-import { Box, Typography, TextField, Button, Alert, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import {
+  Box, Typography, TextField, Button, Alert, CircularProgress, Dialog, DialogTitle,
+  DialogContent, DialogActions, InputAdornment, IconButton,
+} from '@mui/material';
+import MailOutlineIcon from '@mui/icons-material/MailOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import MarkEmailReadOutlinedIcon from '@mui/icons-material/MarkEmailReadOutlined';
+import LazySteelScene from '../components/three/LazySteelScene';
+import { palette as p, hero, headingFont } from '../styles/tokens';
+
+const features = [
+  ['Live operational visibility', 'Real-time unit status across the plant'],
+  ['ESG performance intelligence', 'Environmental, social & governance scores'],
+  ['Secure enterprise access', 'Role-based permissions for every team'],
+];
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sessionExpired = searchParams.get('expired') === '1';
+  const reduceMotion = useReducedMotion();
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetMessage, setResetMessage] = useState('');
@@ -47,7 +69,7 @@ export default function Login() {
       setError('Please enter both email and password.');
       return;
     }
-    
+
     setLoading(true);
     try {
       const result = await login(email, credentials.password);
@@ -61,188 +83,256 @@ export default function Login() {
     }
   };
 
+  const fade = (delay = 0) => ({
+    initial: reduceMotion ? false : { opacity: 0, y: 14 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5, delay, ease: [0.2, 0.8, 0.2, 1] },
+  });
+
+  const labelSx = { display: 'block', mb: 1, fontWeight: 650, color: p.text, fontSize: '0.8125rem' };
+  const inputSx = { '& .MuiOutlinedInput-root': { minHeight: 52, bgcolor: '#FFFFFF' } };
+
   return (
     <Box sx={{
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      bgcolor: '#19382A',
-      p: 2,
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      p: { xs: 1.5, sm: 3 },
       overflowX: 'hidden',
       position: 'relative',
-      background: '#EAF3EC'
+      background: `radial-gradient(900px 600px at 15% 10%, rgba(52,211,153,0.16), transparent 60%), radial-gradient(800px 600px at 90% 90%, rgba(4,120,87,0.18), transparent 60%), linear-gradient(160deg, #EEF6F3 0%, #E2ECEA 100%)`,
     }}>
-      <Box className="glass-orb" sx={{ width: 260, height: 260, top: '8%', left: '8%', bgcolor: 'rgba(74, 222, 128, 0.18)' }} />
-      <Box className="glass-orb" sx={{ width: 320, height: 320, right: '4%', bottom: '2%', bgcolor: 'rgba(21, 128, 61, 0.12)', animationDelay: '-4s' }} />
-      <Box className="glass-float" sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', md: 'row' },
-        width: 'calc(100% - 8px)',
-        maxWidth: 1040,
-        minWidth: 0,
-        bgcolor: '#FFFFFF',
-        borderRadius: 3,
-        overflow: 'hidden',
-        boxShadow: '0 24px 70px rgba(10, 29, 20, 0.32)',
-        position: 'relative',
-        zIndex: 1,
-        border: '1px solid rgba(255,255,255,0.72)',
-        backdropFilter: 'blur(18px)',
-        transition: 'transform 220ms ease, box-shadow 220ms ease',
-        '&:hover': {
-          transform: 'translateY(-3px)',
-          boxShadow: '0 30px 80px rgba(10, 29, 20, 0.38)',
-        }
-      }}>
-        
-        {/* LEFT SECTION */}
+      <div className="gs-grid-bg" aria-hidden />
+      <Box className="glass-orb" sx={{ width: 320, height: 320, top: '4%', left: '6%', bgcolor: 'rgba(52, 211, 153, 0.22)' }} />
+      <Box className="glass-orb" sx={{ width: 380, height: 380, right: '2%', bottom: '0%', bgcolor: 'rgba(4, 120, 87, 0.18)', animationDelay: '-5s' }} />
+
+      <Box
+        component={motion.div}
+        initial={reduceMotion ? false : { opacity: 0, y: 24, rotateX: 8 }}
+        animate={{ opacity: 1, y: 0, rotateX: 0 }}
+        transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+        style={{ transformPerspective: 1400 }}
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          width: '100%',
+          maxWidth: 1180,
+          minWidth: 0,
+          minHeight: { md: 760 },
+          borderRadius: { xs: '24px', md: '32px' },
+          overflow: 'hidden',
+          position: 'relative',
+          zIndex: 1,
+          bgcolor: 'rgba(255,255,255,0.7)',
+          border: '1px solid rgba(255,255,255,0.9)',
+          backdropFilter: 'blur(20px)',
+          boxShadow: '0 2px 4px rgba(15,23,42,0.04), 0 40px 80px -24px rgba(15,23,42,0.35), 0 80px 120px -60px rgba(6,78,59,0.35)',
+        }}
+      >
+        {/* LEFT — 3D brand panel */}
         <Box sx={{
-          flex: 1,
+          flex: 1.25,
           width: '100%',
           minWidth: 0,
-          p: { xs: 4, md: 6, lg: 8 },
-          bgcolor: 'rgba(47, 107, 73, 0.92)',
+          minHeight: { xs: 360, md: 'auto' },
+          position: 'relative',
+          overflow: 'hidden',
           color: '#FFFFFF',
+          background: `${hero.glow}, ${hero.gradient(160)}`,
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center'
+          justifyContent: 'space-between',
+          p: { xs: 3.5, md: 5, lg: 6 },
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.75, mb: 5 }}>
-            <Box sx={{ width: 8, height: 30, borderRadius: 1, bgcolor: '#8EB69A' }} />
-            <Typography sx={{ fontSize: '1.2rem', lineHeight: 1.1, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.03em' }}>
+          <LazySteelScene variant="hero" offsetX={1.1} offsetY={2.95} scale={0.76} />
+          {/* readability scrim */}
+          <Box aria-hidden sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(6,78,59,0) 0%, rgba(6,78,59,0) 50%, rgba(6,78,59,0.45) 100%)', pointerEvents: 'none' }} />
+
+          <Box component={motion.div} {...fade(0.15)} sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Typography sx={{ fontFamily: headingFont, fontSize: '1.25rem', lineHeight: 1.1, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.03em' }}>
               GreenSteel
             </Typography>
           </Box>
-          
-          <Typography sx={{ color: '#A9C8B2', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', mb: 1.5 }}>
-            Enterprise sustainability console
-          </Typography>
-          <Typography variant="h2" sx={{ fontSize: { xs: '1.8rem', md: '2.15rem' }, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.08, mb: 2.25, letterSpacing: '-0.03em' }}>
-            Enterprise<br />Environmental<br />Monitoring
-          </Typography>
-          
-          <Typography sx={{ fontSize: '0.98rem', color: '#C0D2C5', lineHeight: 1.7, maxWidth: 390, overflowWrap: 'anywhere' }}>
-            Monitor emissions, track ESG metrics, and manage industrial sustainability from a single enterprise console.
-          </Typography>
 
-          <Box sx={{ display: 'grid', gap: 1.25, mt: 6 }}>
-            {['Live operational visibility', 'ESG performance intelligence', 'Secure enterprise access'].map((item) => (
-              <Box key={item} sx={{ display: 'flex', alignItems: 'center', gap: 1.25, color: '#DCE9DF', fontSize: '0.82rem' }}>
-                <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#8EB69A', boxShadow: '0 0 0 4px rgba(142,182,154,0.12)' }} />
-                {item}
+          <Box sx={{ position: 'relative', mt: { xs: 16, md: 0 } }}>
+            <Box component={motion.div} {...fade(0.25)}>
+              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, px: 1.25, py: 0.5, mb: 2, borderRadius: 999, bgcolor: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.28)', backdropFilter: 'blur(8px)' }}>
+                <span className="gs-live-dot" />
+                <Typography sx={{ color: '#FFFFFF', fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                  Enterprise sustainability console
+                </Typography>
               </Box>
-            ))}
+              <Typography variant="h2" sx={{ fontSize: { xs: '2.2rem', md: '2.75rem' }, fontWeight: 800, color: '#FFFFFF', lineHeight: 1.05, mb: 2, letterSpacing: '-0.04em', textShadow: '0 2px 18px rgba(6,78,59,0.35)' }}>
+                Enterprise Environmental{' '}
+                <Box component="span" sx={{ background: 'linear-gradient(90deg, #FFFFFF, #A7F3D0)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
+                  Monitoring
+                </Box>
+              </Typography>
+              <Typography sx={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.92)', lineHeight: 1.7, maxWidth: 420, overflowWrap: 'anywhere' }}>
+                Monitor emissions, track ESG metrics, and manage industrial sustainability from a single enterprise console.
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: 'grid', gap: 0.75, mt: 3 }}>
+              {features.map(([item, hint], idx) => (
+                <Box
+                  key={item}
+                  component={motion.div}
+                  {...fade(0.35 + idx * 0.08)}
+                  sx={{
+                    display: 'flex', alignItems: 'center', gap: 1.5, px: 1.5, py: 0.9, borderRadius: '14px',
+                    bgcolor: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.24)', backdropFilter: 'blur(10px)',
+                    maxWidth: 420,
+                  }}
+                >
+                  <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: p.mint, boxShadow: `0 0 0 4px rgba(52,211,153,0.15), 0 0 12px ${p.mint}`, flexShrink: 0 }} />
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography sx={{ color: '#FFFFFF', fontSize: '0.84rem', fontWeight: 650 }}>{item}</Typography>
+                    <Typography sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.74rem' }}>{hint}</Typography>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
           </Box>
         </Box>
 
-        {/* RIGHT SECTION */}
+        {/* RIGHT — form */}
         <Box sx={{
           flex: 1,
           width: '100%',
           minWidth: 0,
-          p: { xs: 4, md: 6, lg: 8 },
+          p: { xs: 3.5, sm: 5, lg: 7 },
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          bgcolor: 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(14px)'
+          bgcolor: 'rgba(255, 255, 255, 0.88)',
         }}>
-          <Typography variant="h1" sx={{ fontSize: '1.75rem', fontWeight: 700, color: '#17201B', mb: 1 }}>
-            Welcome back
-          </Typography>
-          
-          <Typography sx={{ fontSize: '1rem', color: '#66716A', mb: 4 }}>
-            Please enter your details to sign in.
-          </Typography>
+          <Box component={motion.div} {...fade(0.2)} sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
+            <Typography variant="h1" sx={{ fontSize: '2rem', mb: 1 }}>
+              Welcome back
+            </Typography>
+            <Typography sx={{ fontSize: '0.95rem', color: p.textSecondary, mb: 4 }}>
+              Please enter your details to sign in.
+            </Typography>
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-              {error}
-            </Alert>
-          )}
+            {sessionExpired && !error && (
+              <Alert severity="info" sx={{ mb: 3 }}>Your session has expired. Please sign in again.</Alert>
+            )}
 
-          <form onSubmit={handleLogin} noValidate>
-            <Box sx={{ mb: 3 }}>
-              <Typography component="label" htmlFor="email" sx={{ display: 'block', mb: 1, fontWeight: 600, color: '#17201B', fontSize: '0.875rem' }}>
-                Email
-              </Typography>
-              <TextField
-                id="email"
-                fullWidth
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={credentials.email}
-                onChange={handleChange}
-                sx={{ '& .MuiOutlinedInput-root': { bgcolor: '#FFFFFF' } }}
-              />
-            </Box>
+            {error && (
+              <Alert severity="error" sx={{ mb: 3 }}>
+                {error}
+              </Alert>
+            )}
 
-            <Box sx={{ mb: 4 }}>
-              <Typography component="label" htmlFor="password" sx={{ display: 'block', mb: 1, fontWeight: 600, color: '#17201B', fontSize: '0.875rem' }}>
-                Password
-              </Typography>
-              <TextField
-                id="password"
-                fullWidth
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={credentials.password}
-                onChange={handleChange}
-                sx={{ '& .MuiOutlinedInput-root': { bgcolor: '#FFFFFF' } }}
-              />
-            </Box>
+            <form onSubmit={handleLogin} noValidate>
+              <Box sx={{ mb: 2.5 }}>
+                <Typography component="label" htmlFor="email" sx={labelSx}>
+                  Email
+                </Typography>
+                <TextField
+                  id="email"
+                  fullWidth
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@company.com"
+                  required
+                  value={credentials.email}
+                  onChange={handleChange}
+                  sx={inputSx}
+                  slotProps={{ input: { startAdornment: <InputAdornment position="start"><MailOutlineIcon sx={{ fontSize: 20, color: p.textSecondary }} /></InputAdornment> } }}
+                />
+              </Box>
 
-            <Button
-              fullWidth
-              type="submit"
-              variant="contained"
-              disabled={loading}
-              sx={{ 
-                mb: 3, 
-                py: 1.5,
-                fontSize: '1rem',
-                fontWeight: 600,
-                minHeight: 48,
-                bgcolor: '#15803D',
-                color: '#FFFFFF',
-                '&:hover': { bgcolor: '#166534' }
-              }}
-            >
-              {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
-            </Button>
-            
-            <Box sx={{ textAlign: 'center' }}>
+              <Box sx={{ mb: 1.5 }}>
+                <Typography component="label" htmlFor="password" sx={labelSx}>
+                  Password
+                </Typography>
+                <TextField
+                  id="password"
+                  fullWidth
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  required
+                  value={credentials.password}
+                  onChange={handleChange}
+                  sx={inputSx}
+                  slotProps={{ input: {
+                    startAdornment: <InputAdornment position="start"><LockOutlinedIcon sx={{ fontSize: 20, color: p.textSecondary }} /></InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword((v) => !v)}
+                          edge="end"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          sx={{ color: p.textSecondary }}
+                        >
+                          {showPassword ? <VisibilityOffOutlinedIcon fontSize="small" /> : <VisibilityOutlinedIcon fontSize="small" />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  } }}
+                />
+              </Box>
+
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+                <Button
+                  type="button"
+                  onClick={() => { setResetEmail(credentials.email); setResetMessage(''); setResetOpen(true); }}
+                  sx={{ color: p.primary, fontWeight: 650, fontSize: '0.8125rem', minHeight: 32, px: 1, py: 0.5 }}
+                >
+                  Forgot Password?
+                </Button>
+              </Box>
+
               <Button
-                type="button"
-                onClick={() => { setResetEmail(credentials.email); setResetMessage(''); setResetOpen(true); }}
-                sx={{ color: '#315B42', fontWeight: 600, fontSize: '0.875rem', minHeight: 32, p: 0.5 }}
+                fullWidth
+                type="submit"
+                variant="contained"
+                disabled={loading}
+                endIcon={loading ? null : <ArrowForwardIcon />}
+                sx={{
+                  py: 1.5,
+                  fontSize: '1rem',
+                  minHeight: 54,
+                  borderRadius: '14px',
+                  '& .MuiButton-endIcon': { transition: 'transform 200ms ease' },
+                  '&:hover .MuiButton-endIcon': { transform: 'translateX(4px)' },
+                }}
               >
-                Forgot Password?
+                {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
               </Button>
-            </Box>
-          </form>
-        </Box>
+            </form>
 
+            <Typography sx={{ mt: 4, textAlign: 'center', fontSize: '0.75rem', color: '#64748B' }}>
+              Protected by enterprise-grade encryption
+            </Typography>
+          </Box>
+        </Box>
       </Box>
 
       <Dialog open={resetOpen} onClose={() => setResetOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>Forgot your password?</DialogTitle>
-        <DialogContent>
+        <DialogTitle sx={{ pt: 3.5, px: 3.5, pb: 1, fontFamily: headingFont, fontWeight: 800, fontSize: '1.3rem' }}>
+          Forgot your password?
+        </DialogTitle>
+        <DialogContent sx={{ px: 3.5 }}>
           {resetError && <Alert severity="error" sx={{ mt: 1, mb: 2 }}>{resetError}</Alert>}
           {resetMessage ? (
-            <Box sx={{ pt: 1 }}>
-              <Typography sx={{ fontWeight: 800, fontSize: '1.1rem', color: '#17201B', mb: 1 }}>Check your email</Typography>
+            <Box sx={{ pt: 1, textAlign: 'center' }}>
+              <Box sx={{ width: 64, height: 64, mx: 'auto', mb: 2, borderRadius: '20px', display: 'grid', placeItems: 'center', color: '#fff', background: `linear-gradient(145deg, #059669, ${p.primaryDark})`, boxShadow: '0 12px 24px -8px rgba(6,78,59,0.5), inset 0 1px 0 rgba(255,255,255,0.25)' }}>
+                <MarkEmailReadOutlinedIcon />
+              </Box>
+              <Typography sx={{ fontWeight: 800, fontSize: '1.1rem', color: p.text, mb: 1 }}>Check your email</Typography>
               <Typography variant="body2">{resetMessage}</Typography>
               <Typography variant="body2" sx={{ mt: 1 }}>For security, we do not reveal whether an account exists for this email.</Typography>
             </Box>
           ) : (
             <Box component="form" id="reset-password-form" onSubmit={handleResetRequest} sx={{ pt: 1 }}>
-              <Typography variant="body2" sx={{ mb: 2 }}>
+              <Typography variant="body2" sx={{ mb: 2.5 }}>
                 Enter the email address associated with your GreenSteel account and we&apos;ll send you a password reset link.
               </Typography>
               <TextField
@@ -257,7 +347,7 @@ export default function Login() {
             </Box>
           )}
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 3 }}>
+        <DialogActions sx={{ px: 3.5, pb: 3.5, gap: 1 }}>
           <Button variant="outlined" onClick={() => setResetOpen(false)}>{resetMessage ? 'Back to Sign In' : 'Cancel'}</Button>
           {!resetMessage && <Button variant="contained" type="submit" form="reset-password-form" disabled={resetLoading}>{resetLoading ? <CircularProgress size={20} color="inherit" /> : 'Send Reset Link'}</Button>}
         </DialogActions>

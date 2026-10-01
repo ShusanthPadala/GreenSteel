@@ -32,6 +32,7 @@ public class EmissionTypeServiceImpl implements EmissionTypeService {
                 .emissionType(request.getEmissionType())
                 .unit(request.getUnit())
                 .description(request.getDescription())
+                .limitValue(request.getLimitValue())
                 .active(true)
                 .build();
 
@@ -58,6 +59,7 @@ public class EmissionTypeServiceImpl implements EmissionTypeService {
         emissionType.setEmissionType(request.getEmissionType());
         emissionType.setUnit(request.getUnit());
         emissionType.setDescription(request.getDescription());
+        emissionType.setLimitValue(request.getLimitValue());
         emissionType.setActive(request.getActive());
 
         EmissionType updated = emissionTypeRepository.save(emissionType);

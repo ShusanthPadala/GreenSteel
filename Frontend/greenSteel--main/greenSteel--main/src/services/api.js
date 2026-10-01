@@ -29,11 +29,12 @@ api.interceptors.response.use(
         // Optional: you can implement global logout or token refresh logic here
         // For now, we will let the components handle the exact logic
         // or just clear the token and force a reload if appropriate.
-        if (error.response.status === 401) {
+        const isAuthCall = String(error.config?.url || '').includes('/auth/');
+        if (error.response.status === 401 && !isAuthCall) {
            clearAuth();
-           // Avoid infinite reload loop if already on login page
-           if (window.location.pathname !== '/login') {
-             window.location.href = '/login';
+           // Session expired: send the user to sign in again (once)
+           if (!['/login', '/'].includes(window.location.pathname)) {
+             window.location.href = '/login?expired=1';
            }
         }
       }

@@ -4,14 +4,21 @@ import ResourcePage from '../../components/common/ResourcePage';
 import { unitService } from '../../services/unitService';
 import { getDepartments } from '../../services/departmentService';
 import { getErrorMessage } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
+import { isDepartmentScoped } from '../../utils/permissions';
 
 export default function Units() {
+  const { user } = useAuth();
+  const scoped = isDepartmentScoped(user);
+  const scopeFilter = useMemo(() => (scoped ? (row) => row.departmentName === user?.department : null), [scoped, user?.department]);
   const [departments, setDepartments] = useState([]);
   const [error, setError] = useState('');
   useEffect(() => { getDepartments().then(setDepartments).catch((e) => setError(getErrorMessage(e, 'Unable to load departments.'))); }, []);
-  const options = useMemo(() => departments.map((department) => ({ value: department.id, label: department.departmentName })), [departments]);
+  const options = useMemo(() => departments
+    .filter((department) => !scoped || department.departmentName === user?.department)
+    .map((department) => ({ value: department.id, label: department.departmentName })), [departments, scoped, user?.department]);
   if (error) return <Box><Alert severity="error">{error}</Alert></Box>;
-  return <ResourcePage title="Units" subtitle="Manage operational units" service={{ list: unitService.getAllUnits, create: unitService.createUnit, update: unitService.updateUnit, remove: unitService.deleteUnit }}
+  return <ResourcePage title="Units" subtitle="Manage operational units" resource="units" scopeFilter={scopeFilter} service={{ list: unitService.getAllUnits, create: unitService.createUnit, update: unitService.updateUnit, remove: unitService.deleteUnit }}
     searchKeys={['unitName', 'unitCode', 'departmentName', 'status']} searchPlaceholder="Search units"
     fields={[
       { name: 'unitName', label: 'Unit name', required: true }, { name: 'unitCode', label: 'Unit code', required: true },

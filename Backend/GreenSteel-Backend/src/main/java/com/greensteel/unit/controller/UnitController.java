@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class UnitController {
     private final UnitService unitService;
 
     @PostMapping
+    @PreAuthorize("@access.can('units', 'create')")
     public ResponseEntity<ApiResponse<UnitResponse>> createUnit(
             @Valid @RequestBody CreateUnitRequest request) {
 
@@ -55,6 +57,7 @@ public class UnitController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@access.can('units', 'edit')")
     public ResponseEntity<ApiResponse<UnitResponse>> updateUnit(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUnitRequest request) {
@@ -68,6 +71,7 @@ public class UnitController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@access.can('units', 'delete')")
     public ResponseEntity<ApiResponse<Void>> deleteUnit(@PathVariable Long id) {
 
         unitService.deleteUnit(id);

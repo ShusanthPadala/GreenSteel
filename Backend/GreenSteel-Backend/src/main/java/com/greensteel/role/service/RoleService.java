@@ -1,5 +1,6 @@
 package com.greensteel.role.service;
 
+import com.greensteel.common.exception.ResourceNotFoundException;
 import com.greensteel.role.entity.Role;
 import com.greensteel.role.repository.RoleRepository;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,13 @@ public class RoleService {
         return roleRepository.findAll();
     }
     public Role getRoleById(Long id) {
-        return roleRepository.findById(id).get();
+        return roleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
     }
     public Role updateRole(Long id, Role updatedRole) {
 
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 
         role.setRoleName(updatedRole.getRoleName());
         role.setDescription(updatedRole.getDescription());
@@ -33,7 +35,7 @@ public class RoleService {
     }
     public String deleteRole(Long id) {
         Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
         roleRepository.delete(role);
         return "Role deleted successfully";
     }

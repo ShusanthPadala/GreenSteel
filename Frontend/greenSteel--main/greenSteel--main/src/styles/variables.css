@@ -1,49 +1,49 @@
 :root {
 
-    /* ========= COLORS ========= */
+    /* ========= COLORS (unified with the GreenSteel theme) ========= */
 
-    --primary: #5F7F4F;
-    --primary-hover: #456238;
+    --primary: #047857;
+    --primary-hover: #065F46;
 
-    --primary-light: #EAF2E5;
+    --primary-light: #ECFDF5;
 
-    --background: #F5F7F4;
+    --background: #F6F8FA;
 
     --surface: #FFFFFF;
 
-    --border: #DCE2DD;
+    --border: #E2E8F0;
 
-    --text-primary: #1E2922;
+    --text-primary: #0F172A;
 
-    --text-secondary: #637067;
+    --text-secondary: #475569;
 
-    --success: #4CAF50;
+    --success: #059669;
 
-    --warning: #F4B740;
+    --warning: #D97706;
 
-    --danger: #E25C5C;
+    --danger: #DC2626;
 
-    /* ========= SHADOWS ========= */
+    /* ========= SHADOWS (layered depth) ========= */
 
     --shadow-sm:
-            0 6px 20px rgba(24,43,34,.07);
+            0 1px 2px rgba(15,23,42,.04), 0 6px 16px rgba(15,23,42,.07);
 
     --shadow-md:
-            0 12px 28px rgba(24,43,34,.11);
+            0 2px 4px rgba(15,23,42,.04), 0 12px 24px rgba(15,23,42,.10);
 
     --shadow-lg:
-            0 24px 52px rgba(38,62,45,.14);
+            0 2px 4px rgba(15,23,42,.04), 0 32px 56px -16px rgba(6,78,59,.22);
 
     /* ========= BORDER ========= */
 
-    --radius-sm:10px;
+    --radius-sm:12px;
 
-    --radius-md:16px;
+    --radius-md:18px;
 
-    --radius-lg:22px;
+    --radius-lg:24px;
 
     /* ========= TRANSITIONS ========= */
 
-    --transition: 180ms ease;
+    --transition: 180ms cubic-bezier(.2,.8,.2,1);
 
 }

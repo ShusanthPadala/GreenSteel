@@ -11,6 +11,7 @@ import com.greensteel.unit.entity.Unit;
 import com.greensteel.unit.mapper.UnitMapper;
 import com.greensteel.unit.repository.UnitRepository;
 import com.greensteel.unit.service.UnitService;
+import com.greensteel.security.access.AccessPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class UnitServiceImpl implements UnitService {
     private final UnitRepository unitRepository;
     private final DepartmentRepository departmentRepository;
     private final UnitMapper unitMapper;
+    private final AccessPolicy accessPolicy;
 
     @Override
     public UnitResponse createUnit(CreateUnitRequest request) {
@@ -50,6 +52,10 @@ public class UnitServiceImpl implements UnitService {
 
         Unit unit = unitRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Unit not found"));
+
+        // Plant engineers: only their own department's units, and they can't move a unit elsewhere
+        accessPolicy.requireDepartment(unit.getDepartment() != null ? unit.getDepartment().getId() : null);
+        accessPolicy.requireDepartment(request.getDepartmentId());
 
         if (!unit.getUnitCode().equals(request.getUnitCode())
                 && unitRepository.existsByUnitCode(request.getUnitCode())) {

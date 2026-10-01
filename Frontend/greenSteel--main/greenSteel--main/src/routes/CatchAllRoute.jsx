@@ -1,24 +1,12 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import Loader3D from "../components/ui/Loader3D";
 
 const CatchAllRoute = () => {
     const { isAuthenticated, loading } = useAuth();
 
     if (loading) {
-        return (
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "100vh",
-                    fontSize: "20px",
-                    fontWeight: "600",
-                }}
-            >
-                Loading...
-            </div>
-        );
+        return <Loader3D label="Loading GreenSteel..." minHeight="100vh" />;
     }
 
     return (

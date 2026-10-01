@@ -24,6 +24,9 @@ public class EmissionType {
 
     private String description;
 
+    /** Maximum allowed reading for this pollutant (e.g. 50 mg/Nm3 for PM). Null = use plant default. */
+    private Double limitValue;
+
     @Builder.Default
     private Boolean active = true;
 }

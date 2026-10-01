@@ -9,6 +9,8 @@ import {
     MdApartment,
     MdCategory,
     MdPeople,
+    MdAdminPanelSettings,
+    MdHub,
 } from "react-icons/md";
 
 export const sidebarMenu = [
@@ -41,6 +43,11 @@ export const sidebarMenu = [
         section: "Environmental",
         items: [
             {
+                title: "Plant Gas Flow",
+                path: "/plant-map",
+                icon: MdHub,
+            },
+            {
                 title: "Emission Records",
                 path: "/emission-records",
                 icon: MdCo2,
@@ -64,6 +71,12 @@ export const sidebarMenu = [
                 title: "Users",
                 path: "/users",
                 icon: MdPeople,
+                roles: ["SUPER_ADMIN"],
+            },
+            {
+                title: "Roles",
+                path: "/roles",
+                icon: MdAdminPanelSettings,
                 roles: ["SUPER_ADMIN"],
             },
             {

@@ -17,5 +17,7 @@ public class EmissionTypeResponse {
 
     private String description;
 
+    private Double limitValue;
+
     private Boolean active;
 }

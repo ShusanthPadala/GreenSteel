@@ -1,5 +1,6 @@
 package com.greensteel.emissionrecord.service.impl;
 
+import com.greensteel.alert.service.AlertService;
 import com.greensteel.common.exception.ResourceNotFoundException;
 import com.greensteel.emissionrecord.dto.request.CreateEmissionRecordRequest;
 import com.greensteel.emissionrecord.dto.request.UpdateEmissionRecordRequest;
@@ -8,10 +9,12 @@ import com.greensteel.emissionrecord.entity.EmissionRecord;
 import com.greensteel.emissionrecord.mapper.EmissionRecordMapper;
 import com.greensteel.emissionrecord.repository.EmissionRecordRepository;
 import com.greensteel.emissionrecord.service.EmissionRecordService;
+import com.greensteel.security.access.AccessPolicy;
 import com.greensteel.unit.entity.Unit;
 import com.greensteel.unit.repository.UnitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,13 +29,21 @@ public class EmissionRecordServiceImpl implements EmissionRecordService {
 
     private final EmissionRecordMapper emissionRecordMapper;
 
+    private final AccessPolicy accessPolicy;
+
+    private final AlertService alertService;
+
     @Override
+    @Transactional
     public EmissionRecordResponse createEmissionRecord(
             CreateEmissionRecordRequest request) {
 
         Unit unit = unitRepository.findById(request.getUnitId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Unit not found"));
+
+        // Plant engineers may only record emissions for their own department
+        accessPolicy.requireDepartment(departmentIdOf(unit));
 
         EmissionRecord record = EmissionRecord.builder()
 
@@ -60,11 +71,12 @@ public class EmissionRecordServiceImpl implements EmissionRecordService {
 
                 .build();
 
-        return emissionRecordMapper.toResponse(
+        EmissionRecord saved = emissionRecordRepository.save(record);
 
-                emissionRecordRepository.save(record)
+        // Raise an alert automatically if any pollutant is at or over its limit
+        alertService.evaluate(saved);
 
-        );
+        return emissionRecordMapper.toResponse(saved);
     }
 
     @Override
@@ -107,6 +119,7 @@ public class EmissionRecordServiceImpl implements EmissionRecordService {
     }
 
     @Override
+    @Transactional
     public EmissionRecordResponse updateEmissionRecord(
             Long id,
             UpdateEmissionRecordRequest request) {
@@ -116,6 +129,8 @@ public class EmissionRecordServiceImpl implements EmissionRecordService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Emission Record not found"));
+
+        accessPolicy.requireDepartment(departmentIdOf(record.getUnit()));
 
         record.setCox(request.getCox());
 
@@ -135,11 +150,21 @@ public class EmissionRecordServiceImpl implements EmissionRecordService {
 
         record.setStatus(request.getStatus());
 
-        return emissionRecordMapper.toResponse(
+        EmissionRecord saved = emissionRecordRepository.save(record);
 
-                emissionRecordRepository.save(record)
+        alertService.evaluate(saved);
 
-        );
+        return emissionRecordMapper.toResponse(saved);
+
+    }
+
+    private static Long departmentIdOf(Unit unit) {
+
+        return unit != null && unit.getDepartment() != null
+
+                ? unit.getDepartment().getId()
+
+                : null;
 
     }
 

@@ -1,4 +1,4 @@
-import api from "./api";
+import api, { unwrapApiResponse } from "./api";
 
 const getSummary = async () => {
 
@@ -16,10 +16,20 @@ const getTrends = async () => {
 
 };
 
+// Department drill-down: units, efficiency and health for one department
+const getDepartmentDashboard = async (departmentId) => {
+
+    const response = await api.get(`/dashboard/${departmentId}`);
+
+    return unwrapApiResponse(response.data);
+
+};
+
 const dashboardService = {
 
     getSummary,
     getTrends,
+    getDepartmentDashboard,
 
 };
 

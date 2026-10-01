@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class EmissionRecordController {
     private final EmissionRecordService emissionRecordService;
 
     @PostMapping
+    @PreAuthorize("@access.can('emission-records', 'create')")
     public ResponseEntity<ApiResponse<EmissionRecordResponse>> createEmissionRecord(
             @Valid @RequestBody CreateEmissionRecordRequest request) {
 
@@ -76,6 +78,7 @@ public class EmissionRecordController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@access.can('emission-records', 'edit')")
     public ResponseEntity<ApiResponse<EmissionRecordResponse>> updateEmissionRecord(
             @PathVariable Long id,
             @Valid @RequestBody UpdateEmissionRecordRequest request) {
@@ -90,6 +93,7 @@ public class EmissionRecordController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@access.can('emission-records', 'delete')")
     public ResponseEntity<ApiResponse<Void>> deleteEmissionRecord(
             @PathVariable Long id) {
 

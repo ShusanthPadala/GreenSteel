@@ -14,6 +14,7 @@ public class EmissionTypeMapper {
                 .emissionType(emissionType.getEmissionType())
                 .unit(emissionType.getUnit())
                 .description(emissionType.getDescription())
+                .limitValue(emissionType.getLimitValue())
                 .active(emissionType.getActive())
                 .build();
     }

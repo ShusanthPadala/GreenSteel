@@ -1,14 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Alert, Box, Card, CardContent, CircularProgress, Stack,
+  Alert, Box, Card, CardContent, Stack,
   Table, TableBody, TableCell, TableHead, TableRow,
   Typography, Button, Chip
 } from '@mui/material';
-import { Refresh as RefreshIcon, ParkOutlined, GroupOutlined, GavelOutlined, Insights, FactoryOutlined } from '@mui/icons-material';
+import { Refresh as RefreshIcon, ParkOutlined, GroupOutlined, GavelOutlined, Insights, FactoryOutlined, WarningAmberRounded, CheckCircleOutlined } from '@mui/icons-material';
 import { motion, useReducedMotion } from 'framer-motion';
 import { esgService } from '../../services/esgService';
+import TiltCard from '../../components/ui/TiltCard';
+import IconOrb from '../../components/ui/IconOrb';
+import PageHero from '../../components/ui/PageHero';
+import Loader3D from '../../components/ui/Loader3D';
+import { headingFont, hoverLift } from '../../styles/tokens';
+import usePlantData from '../../hooks/usePlantData';
+import { ScoreFormula, DepartmentContribution, FixFirst } from '../../components/emissions/ScoreBreakdown';
 
-// Progressive Radial Score Component
+// Progressive Radial Score Component — 3D ring with glow
 const RadialScore = ({ label, score, color, delay }) => {
   const reduceMotion = useReducedMotion();
   const validScore = typeof score === 'number' && Number.isFinite(score);
@@ -16,43 +23,56 @@ const RadialScore = ({ label, score, color, delay }) => {
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = validScore ? circumference - (score / 100) * circumference : circumference;
+  const gradId = `esg-grad-${label.replace(/\s+/g, '-')}`;
 
   return (
     <motion.div
-      initial={reduceMotion ? false : { opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, delay: delay }}
-      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+      initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: delay * 0.5 }}
+      style={{ height: '100%' }}
     >
-      <Box sx={{ position: 'relative', width: 120, height: 120, display: 'grid', placeItems: 'center', mb: 2 }}>
-        <svg pointerEvents="none" width="120" height="120" style={{ transform: 'rotate(-90deg)' }}>
-          {/* Background Track */}
-          <circle cx="60" cy="60" r={radius} fill="transparent" stroke="#f0f5f1" strokeWidth="8" />
-          {/* Animated Progress */}
-          {validScore && (
-            <motion.circle
-              cx="60"
-              cy="60"
-              r={radius}
-              fill="transparent"
-              stroke={color}
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              initial={{ strokeDashoffset: circumference }}
-              animate={{ strokeDashoffset }}
-              transition={{ duration: 1.5, delay: delay + 0.2, ease: "easeOut" }}
-            />
-          )}
-        </svg>
-        <Box sx={{ position: 'absolute', textAlign: 'center' }}>
-          <Typography variant="h3" sx={{ color: color, fontWeight: 800, lineHeight: 1 }}>{displayScore}</Typography>
-          {validScore && <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>/ 100</Typography>}
-        </Box>
-      </Box>
-      <Typography variant="body2" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'text.primary' }}>
-        {label}
-      </Typography>
+      <TiltCard intensity={10}>
+        <Card sx={{ height: '100%', p: { xs: 2.5, md: 3 }, display: 'flex', flexDirection: 'column', alignItems: 'center', transformStyle: 'preserve-3d', overflow: 'visible' }}>
+          <Box sx={{ position: 'relative', width: 132, height: 132, display: 'grid', placeItems: 'center', mb: 2, transform: 'translateZ(28px)' }}>
+            {/* raised disc behind ring */}
+            <Box aria-hidden sx={{ position: 'absolute', inset: 14, borderRadius: '50%', background: 'radial-gradient(circle at 35% 30%, #FFFFFF, #F1F5F9 70%)', boxShadow: `inset 0 -4px 10px rgba(15,23,42,0.06), 0 10px 24px -10px ${color}66` }} />
+            <svg pointerEvents="none" width="132" height="132" viewBox="0 0 120 120" style={{ transform: 'rotate(-90deg)', position: 'relative', filter: `drop-shadow(0 4px 8px ${color}55)` }}>
+              <defs>
+                <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor={color} stopOpacity="0.55" />
+                  <stop offset="100%" stopColor={color} />
+                </linearGradient>
+              </defs>
+              {/* Background Track */}
+              <circle cx="60" cy="60" r={radius} fill="transparent" stroke="#E2E8F0" strokeWidth="9" />
+              {/* Animated Progress */}
+              {validScore && (
+                <motion.circle
+                  cx="60"
+                  cy="60"
+                  r={radius}
+                  fill="transparent"
+                  stroke={`url(#${gradId})`}
+                  strokeWidth="9"
+                  strokeLinecap="round"
+                  strokeDasharray={circumference}
+                  initial={reduceMotion ? false : { strokeDashoffset: circumference }}
+                  animate={{ strokeDashoffset }}
+                  transition={{ duration: 1.5, delay: delay + 0.2, ease: "easeOut" }}
+                />
+              )}
+            </svg>
+            <Box sx={{ position: 'absolute', textAlign: 'center' }}>
+              <Typography sx={{ fontFamily: headingFont, fontSize: '1.6rem', color: color, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em' }}>{displayScore}</Typography>
+              {validScore && <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.7rem' }}>/ 100</Typography>}
+            </Box>
+          </Box>
+          <Typography variant="body2" sx={{ fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'text.primary', fontSize: '0.74rem' }}>
+            {label}
+          </Typography>
+        </Card>
+      </TiltCard>
     </motion.div>
   );
 };
@@ -63,6 +83,7 @@ export default function ESG() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const reduceMotion = useReducedMotion();
+  const plant = usePlantData();
 
   const load = useCallback(async () => {
     try {
@@ -104,11 +125,7 @@ export default function ESG() {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
-         <CircularProgress size={48} sx={{ mb: 3, color: 'primary.main' }} />
-         <Typography variant="h2" sx={{ mb: 1 }}>Analyzing ESG Metrics</Typography>
-         <Typography color="text.secondary">Aggregating sustainability data...</Typography>
-      </Box>
+      <Loader3D label="Analyzing ESG Metrics" sublabel="Aggregating sustainability data..." minHeight="60vh" />
     );
   }
 
@@ -117,7 +134,7 @@ export default function ESG() {
   // Notice mapping keys align with backend exactly
   const metricGroups = [
     {
-      key: 'environmental', title: 'Environmental', icon: ParkOutlined, color: '#2f5c40',
+      key: 'environmental', title: 'Environmental', icon: ParkOutlined, color: '#047857',
       metrics: [
         ['carbonFootprint', 'Carbon Footprint', 'tCO₂e'],
         ['waterEfficiency', 'Water Efficiency', 'L/ton'],
@@ -126,14 +143,14 @@ export default function ESG() {
       ]
     },
     {
-      key: 'social', title: 'Social', icon: GroupOutlined, color: '#32667a',
+      key: 'social', title: 'Social', icon: GroupOutlined, color: '#0E7490',
       metrics: [
         ['employeeSafety', 'Employee Safety', 'idx'],
         ['trainingHours', 'Training Hours', 'hrs'],
       ]
     },
     {
-      key: 'governance', title: 'Governance', icon: GavelOutlined, color: '#8c6014',
+      key: 'governance', title: 'Governance', icon: GavelOutlined, color: '#B45309',
       metrics: [
         ['boardCompliance', 'Board Compliance', '%'],
         ['sustainabilityIndex', 'Sustainability Index', 'idx']
@@ -141,154 +158,144 @@ export default function ESG() {
     }
   ];
 
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, pb: 4 }}>
-      {/* Header */}
-      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ sm: 'flex-end' }} gap={2} sx={{ width: '100%', justifyContent: 'space-between' }}>
-        <Box>
-          <Stack direction="row" alignItems="center" gap={1} mb={0.5}>
-            <Insights sx={{ fontSize: 16, color: 'primary.main' }} />
-            <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              Sustainability Performance
-            </Typography>
-          </Stack>
-          <Typography variant="h1" sx={{ mb: 1, fontFamily: '"Manrope", sans-serif' }}>ESG Overview</Typography>
-          <Typography variant="body1" color="text.secondary">Environmental, social and governance analytics across the plant.</Typography>
-        </Box>
-        <Button
-          variant="outlined"
-          size="small"
-          startIcon={<RefreshIcon />}
-          onClick={load}
-          disabled={loading}
-          sx={{
-            minWidth: 112,
-            height: 36,
-            px: 1.25,
-            py: 0,
-            borderRadius: 1.5,
-            borderColor: '#B8D8C0',
-            color: '#15803D',
-            bgcolor: '#FFFFFF',
-            fontSize: '0.75rem',
-            boxShadow: '0 2px 7px rgba(21,128,61,0.08)',
-            '& .MuiButton-startIcon': { mr: 0.5 },
-            '&:hover': {
-              bgcolor: '#EAF6ED',
-              borderColor: '#15803D',
-              boxShadow: '0 5px 12px rgba(21,128,61,0.14)',
-              transform: 'translateY(-1px)',
-            }
-          }}
-        >
-          Refresh
-        </Button>
-      </Stack>
+  const severityTone = (sev) => (sev === 'CRITICAL'
+    ? { bg: '#FEF2F2', fg: '#B91C1C', border: '#FECACA' }
+    : sev === 'WARNING'
+      ? { bg: '#FFFBEB', fg: '#B45309', border: '#FDE68A' }
+      : { bg: '#F1F5F9', fg: '#334155', border: '#CBD5E1' });
 
-      {error && <Alert severity="error" sx={{ borderRadius: 2 }}>{error}</Alert>}
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 3, md: 3.5 }, pb: 4 }}>
+      <PageHero
+        eyebrow="Sustainability Performance"
+        title="ESG Overview"
+        subtitle="Environmental, social and governance analytics across the plant."
+        icon={<Insights />}
+        actions={(
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={load}
+            disabled={loading}
+            sx={{ minHeight: 44, '& .MuiSvgIcon-root': { transition: 'transform 400ms ease' }, '&:hover .MuiSvgIcon-root': { transform: 'rotate(180deg)' } }}
+          >
+            Refresh
+          </Button>
+        )}
+      />
+
+      {error && <Alert severity="error">{error}</Alert>}
 
       {/* Hero Scores */}
-      <Card sx={{ p: { xs: 3, md: 5 }, borderRadius: 3, border: 'none', boxShadow: '0 8px 32px rgba(17,24,20,0.04)' }}>
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: { xs: 4, md: 2 } }}>
-           <RadialScore label="Overall ESG" score={data?.overallScore} color="#111814" delay={0} />
-           <RadialScore label="Environmental" score={data?.environmentalScore} color="#2f5c40" delay={0.1} />
-           <RadialScore label="Social" score={data?.socialScore} color="#32667a" delay={0.2} />
-           <RadialScore label="Governance" score={data?.governanceScore} color="#8c6014" delay={0.3} />
-        </Box>
-      </Card>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: { xs: 1.5, sm: 2.5 } }}>
+        <RadialScore label="Overall ESG" score={data?.overallScore} color="#064E3B" delay={0} />
+        <RadialScore label="Environmental" score={data?.environmentalScore} color="#047857" delay={0.1} />
+        <RadialScore label="Social" score={data?.socialScore} color="#0E7490" delay={0.2} />
+        <RadialScore label="Governance" score={data?.governanceScore} color="#B45309" delay={0.3} />
+      </Box>
 
       {/* Category Sections */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'repeat(3, 1fr)' }, gap: 2.5 }}>
         {metricGroups.map((group, groupIndex) => (
-          <motion.div key={group.key} initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 + groupIndex * 0.1 }}>
-            <Card sx={{ height: '100%', borderRadius: 2.5, display: 'flex', flexDirection: 'column', border: '1px solid #e5ebe6', position: 'relative', overflow: 'hidden' }}>
-              {/* Top color bar */}
-              <Box sx={{ height: 4, width: '100%', bgcolor: group.color, position: 'absolute', top: 0, left: 0 }} />
-              
-              <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                <Stack direction="row" alignItems="center" gap={2.5} mb={4} mt={1}>
-                  <Box sx={{ p: 1, bgcolor: `${group.color}15`, color: group.color, borderRadius: 1.5, display: 'flex' }}>
-                    <group.icon fontSize="medium" />
-                  </Box>
-                  <Typography variant="h3" sx={{ fontFamily: '"Manrope", sans-serif', color: group.color }}>{group.title}</Typography>
-                </Stack>
-                
-                <Stack spacing={2.5} sx={{ flexGrow: 1, justifyContent: 'center' }}>
-                  {group.metrics.map(([key, label, unit]) => {
-                    const val = data?.[group.key]?.[key];
-                    const isAvailable = typeof val === 'number';
-                    
-                    return (
-                      <Box key={key} sx={{ position: 'relative' }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>{label}</Typography>
-                        <Stack direction="row" alignItems="baseline" spacing={0.5}>
-                          <Typography sx={{ fontWeight: 800, fontSize: '1.6rem', color: isAvailable ? '#111814' : '#aab8af', lineHeight: 1 }}>
-                            {formatValue(val)}
-                          </Typography>
-                          {isAvailable && (
-                            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 700 }}>{unit}</Typography>
-                          )}
-                        </Stack>
-                      </Box>
-                    );
-                  })}
-                </Stack>
-              </CardContent>
-            </Card>
+          <motion.div key={group.key} initial={reduceMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 + groupIndex * 0.1 }} style={{ height: '100%' }}>
+            <TiltCard intensity={6}>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', transformStyle: 'preserve-3d' }}>
+                {/* Top colour band */}
+                <Box sx={{ height: 5, width: '100%', background: `linear-gradient(90deg, ${group.color}, ${group.color}55)` }} />
+                <Box aria-hidden sx={{ position: 'absolute', width: 200, height: 200, borderRadius: '50%', top: -100, right: -80, background: `radial-gradient(circle, ${group.color}1F, transparent 70%)`, pointerEvents: 'none' }} />
+
+                <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                  <Stack direction="row" sx={{ gap: 1.75, mb: 3, alignItems: "center" }}>
+                    <IconOrb tone={group.color} size={44}><group.icon /></IconOrb>
+                    <Typography variant="h3" sx={{ color: group.color }}>{group.title}</Typography>
+                  </Stack>
+
+                  <Stack spacing={1.25} sx={{ flexGrow: 1 }}>
+                    {group.metrics.map(([key, label, unit]) => {
+                      const val = data?.[group.key]?.[key];
+                      const isAvailable = typeof val === 'number';
+
+                      return (
+                        <Box key={key} sx={{ p: 1.75, borderRadius: '14px', bgcolor: 'rgba(246,248,250,0.7)', border: '1px solid rgba(226,232,240,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, ...hoverLift }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>{label}</Typography>
+                          <Stack direction="row" spacing={0.5} sx={{ alignItems: "baseline", flexShrink: 0 }}>
+                            <Typography sx={{ fontFamily: headingFont, fontWeight: 800, fontSize: '1.35rem', color: isAvailable ? '#0F172A' : '#94A3B8', lineHeight: 1, letterSpacing: '-0.02em' }}>
+                              {formatValue(val)}
+                            </Typography>
+                            {isAvailable && (
+                              <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.75rem' }}>{unit}</Typography>
+                            )}
+                          </Stack>
+                        </Box>
+                      );
+                    })}
+                  </Stack>
+                </CardContent>
+              </Card>
+            </TiltCard>
           </motion.div>
         ))}
       </Box>
 
+      {/* Score breakdown — how the numbers are built and where to act */}
+      <ScoreFormula data={data} />
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', xl: '1.6fr 1fr' }, gap: 2.5 }}>
+        <DepartmentContribution analysis={plant.analysis} loading={plant.loading} />
+        <FixFirst analysis={plant.analysis} loading={plant.loading} />
+      </Box>
+
       {/* Operational Overview & Alerts */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', xl: '1fr 2fr' }, gap: 3 }}>
-        
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', xl: '1fr 2fr' }, gap: 2.5 }}>
+
         {/* Plant Overview */}
-        <Card sx={{ borderRadius: 2.5, p: 3, border: '1px solid #e5ebe6', boxShadow: 'none' }}>
-          <Stack direction="row" alignItems="center" gap={2.5} mb={3}>
-            <Box sx={{ p: 1, bgcolor: '#f0f5f1', color: 'primary.main', borderRadius: 1.5, display: 'flex' }}>
-              <FactoryOutlined />
-            </Box>
-            <Typography variant="h3" sx={{ fontFamily: '"Manrope", sans-serif' }}>Plant Overview</Typography>
+        <Card sx={{ p: 3 }}>
+          <Stack direction="row" sx={{ gap: 1.75, mb: 3, alignItems: "center" }}>
+            <IconOrb size={44}><FactoryOutlined /></IconOrb>
+            <Typography variant="h3">Plant Overview</Typography>
           </Stack>
-          
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
+
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.5 }}>
             {[
-              ['blastFurnaces', 'Blast Furnaces'], 
-              ['powerPlants', 'Power Plants'], 
-              ['operationalUnits', 'Operational'], 
-              ['maintenanceUnits', 'Maintenance'], 
-              ['warningUnits', 'Warning'], 
+              ['blastFurnaces', 'Blast Furnaces'],
+              ['powerPlants', 'Power Plants'],
+              ['operationalUnits', 'Operational'],
+              ['maintenanceUnits', 'Maintenance'],
+              ['warningUnits', 'Warning'],
               ['totalUnits', 'Total Units']
             ].map(([key, label]) => (
-              <Box key={key} sx={{ p: 2, bgcolor: '#fafcfb', borderRadius: 2, border: '1px solid #edf3ee', transition: 'all 0.2s', '&:hover': { bgcolor: '#ffffff', borderColor: '#d1e6d8', boxShadow: '0 4px 12px rgba(47,92,64,0.05)' } }}>
-                <Typography sx={{ color: 'text.secondary', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', mb: 0.5 }}>{label}</Typography>
-                <Typography sx={{ fontSize: '1.5rem', fontWeight: 800, color: '#111814' }}>{data?.plantOverview?.[key] ?? '-'}</Typography>
+              <Box key={key} sx={{ p: 2, borderRadius: '14px', background: 'linear-gradient(180deg, #FFFFFF, #F8FAFC)', border: '1px solid #E2E8F0', boxShadow: 'inset 0 1px 0 #fff, 0 2px 0 rgba(15,23,42,0.03)', transition: 'transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease', '&:hover': { borderColor: '#CBD5E1', transform: 'translateY(-3px)', boxShadow: '0 12px 20px -10px rgba(6,78,59,0.25)' } }}>
+                <Typography sx={{ color: 'text.secondary', fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', mb: 0.75 }}>{label}</Typography>
+                <Typography sx={{ fontFamily: headingFont, fontSize: '1.6rem', fontWeight: 800, color: '#0F172A', lineHeight: 1, letterSpacing: '-0.03em' }}>{data?.plantOverview?.[key] ?? '-'}</Typography>
               </Box>
             ))}
           </Box>
         </Card>
 
         {/* Environmental Alerts */}
-        <Card sx={{ borderRadius: 2.5, p: 3, display: 'flex', flexDirection: 'column', border: '1px solid #e5ebe6', boxShadow: 'none' }}>
-          <Stack direction="row" alignItems="center" gap={2} sx={{ justifyContent: 'space-between', mb: 3 }}>
-            <Box>
-              <Typography variant="h3" sx={{ mb: 0.5, fontFamily: '"Manrope", sans-serif' }}>Environmental Alerts</Typography>
-              <Typography variant="body2" color="text.secondary">Latest readings requiring attention</Typography>
-            </Box>
-            <Chip label={`${alerts.length} total`} sx={{ fontWeight: 700, bgcolor: '#f4f7f5', color: '#4b5e53' }} />
+        <Card sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+          <Stack direction="row" sx={{ gap: 2, alignItems: "center", justifyContent: 'space-between', mb: 3 }}>
+            <Stack direction="row" sx={{ gap: 1.75, alignItems: "center" }}>
+              <IconOrb size={44} tone="#D97706"><WarningAmberRounded /></IconOrb>
+              <Box>
+                <Typography variant="h3" sx={{ mb: 0.25 }}>Environmental Alerts</Typography>
+                <Typography variant="body2" color="text.secondary">Latest readings requiring attention</Typography>
+              </Box>
+            </Stack>
+            <Chip label={`${alerts.length} total`} sx={{ fontWeight: 700, bgcolor: '#ECFDF5', color: '#047857', border: '1px solid rgba(4,120,87,0.15)' }} />
           </Stack>
-          
+
           <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             {alerts.length === 0 ? (
-               <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 6, bgcolor: '#fafcfb', borderRadius: 2, border: '1px dashed #d1dbd4' }}>
-                 <Typography variant="body1" sx={{ fontWeight: 700, color: '#2f5c40', mb: 0.5 }}>No environmental alerts</Typography>
+               <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', py: 6, px: 2, background: 'linear-gradient(180deg, rgba(236,253,245,0.5), rgba(246,248,250,0.3))', borderRadius: '16px', border: '1px dashed #CBD5E1' }}>
+                 <Box sx={{ perspective: 400, mb: 2 }}><IconOrb size={52} tone="#059669"><CheckCircleOutlined /></IconOrb></Box>
+                 <Typography variant="body1" sx={{ fontWeight: 700, color: '#047857', mb: 0.5 }}>No environmental alerts</Typography>
                  <Typography variant="body2" color="text.secondary">The latest plant readings are well within expected safety threshold limits.</Typography>
                </Box>
             ) : (
                <Box sx={{ overflowX: 'auto', mx: -3, px: 3 }}>
                  <Table sx={{ minWidth: 600 }}>
                    <TableHead>
-                     <TableRow sx={{ '& th': { borderBottom: '1px solid #e5ebe6', py: 1.5, color: '#637067', fontWeight: 700, fontSize: 12 } }}>
+                     <TableRow>
                        <TableCell>Unit</TableCell>
                        <TableCell>Pollutant</TableCell>
                        <TableCell align="right">Recorded Value</TableCell>
@@ -297,37 +304,36 @@ export default function ESG() {
                      </TableRow>
                    </TableHead>
                    <TableBody>
-                     {alerts.map((item, index) => (
-                       <TableRow key={index} hover sx={{ '& td': { borderBottom: '1px solid #f0f5f1', py: 2 } }}>
-                         <TableCell sx={{ fontWeight: 600 }}>{item.unitName || item.unitId || '-'}</TableCell>
+                     {alerts.map((item, index) => {
+                       const tone = severityTone(item.severity);
+                       return (
+                       <TableRow key={index} hover>
+                         <TableCell sx={{ fontWeight: 650 }}>{item.unitName || item.unitId || '-'}</TableCell>
                          <TableCell sx={{ color: 'text.secondary' }}>{item.pollutant || '-'}</TableCell>
-                         <TableCell align="right" sx={{ fontWeight: 700, fontFamily: 'monospace', fontSize: 13 }}>{formatValue(item.value)}</TableCell>
+                         <TableCell align="right" sx={{ fontWeight: 700, fontFamily: 'ui-monospace, monospace', fontVariantNumeric: 'tabular-nums', fontSize: 13 }}>{formatValue(item.value)}</TableCell>
                          <TableCell>
-                           <Chip 
-                             size="small" 
-                             label={item.severity || 'Unknown'} 
-                             sx={{ 
-                               height: 24, fontSize: 11, fontWeight: 700,
-                               bgcolor: item.severity === 'CRITICAL' ? '#fceded' : item.severity === 'WARNING' ? '#fcf3e3' : '#f0f5f1',
-                               color: item.severity === 'CRITICAL' ? '#c24141' : item.severity === 'WARNING' ? '#b27b16' : '#4b5e53',
-                               border: `1px solid ${item.severity === 'CRITICAL' ? '#f5c6c6' : item.severity === 'WARNING' ? '#f5dfac' : '#d1dbd4'}`
-                             }} 
+                           <Chip
+                             size="small"
+                             label={item.severity || 'Unknown'}
+                             icon={<Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: tone.fg, ml: '8px !important', mr: '-2px !important' }} />}
+                             sx={{ height: 26, fontSize: 11, fontWeight: 700, bgcolor: tone.bg, color: tone.fg, border: `1px solid ${tone.border}` }}
                            />
                          </TableCell>
                          <TableCell>
-                           <Typography variant="body2" sx={{ fontWeight: 600, color: item.resolved ? '#1a7a4c' : '#637067' }}>
+                           <Typography variant="body2" sx={{ fontWeight: 650, color: item.resolved ? '#047857' : '#475569' }}>
                              {item.resolved ? 'Yes' : 'No'}
                            </Typography>
                          </TableCell>
                        </TableRow>
-                     ))}
+                       );
+                     })}
                    </TableBody>
                  </Table>
                </Box>
             )}
           </Box>
         </Card>
-        
+
       </Box>
     </Box>
   );

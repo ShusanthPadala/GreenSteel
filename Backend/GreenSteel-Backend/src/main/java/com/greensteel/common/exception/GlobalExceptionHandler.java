@@ -5,6 +5,7 @@ import com.greensteel.common.response.ApiResponse;
 import io.micrometer.common.lang.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -96,6 +97,21 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    /** Role or department rule blocked the request (e.g. an engineer editing another department's unit). */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException ex) {
+        String message = ex.getMessage() != null && ex.getMessage().startsWith("You can only")
+                ? ex.getMessage()
+                : "Your role doesn't have permission to do this.";
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                ApiResponse.<Void>builder()
+                        .success(false)
+                        .message(message)
+                        .data(null)
+                        .build()
+        );
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

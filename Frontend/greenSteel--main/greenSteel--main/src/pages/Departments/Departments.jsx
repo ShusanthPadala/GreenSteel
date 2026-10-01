@@ -4,7 +4,7 @@ import { getDepartments, createDepartment, updateDepartment, deleteDepartment } 
 const service = { list: getDepartments, create: createDepartment, update: updateDepartment, remove: deleteDepartment };
 
 export default function Departments() {
-  return <ResourcePage title="Departments" subtitle="Manage plant departments" service={service}
+  return <ResourcePage title="Departments" subtitle="Manage plant departments" service={service} resource="departments"
     searchKeys={['departmentName', 'departmentCode', 'description']} searchPlaceholder="Search departments"
     fields={[
       { name: 'departmentName', label: 'Department name', required: true },

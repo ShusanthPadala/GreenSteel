@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class ReportController {
     private final ReportService reportService;
 
     @PostMapping
+    @PreAuthorize("@access.can('reports', 'create')")
     public ResponseEntity<ApiResponse<ReportResponse>> createReport(
             @Valid @RequestBody CreateReportRequest request) {
 
@@ -60,6 +62,7 @@ public class ReportController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@access.can('reports', 'edit')")
     public ResponseEntity<ApiResponse<ReportResponse>> updateReport(
             @PathVariable Long id,
             @Valid @RequestBody UpdateReportRequest request) {
@@ -74,6 +77,7 @@ public class ReportController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@access.can('reports', 'delete')")
     public ResponseEntity<ApiResponse<Void>> deleteReport(
             @PathVariable Long id) {
 
