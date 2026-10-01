@@ -30,3 +30,7 @@ Backend/GreenSteel-Backend/src/main/resources/application-dev.properties
 
 # IntelliJ IDEA
 .idea/
+
+# Local backups and scratch output (not part of the app)
+Backend/backend-src-backup-before-changes.zip
+Claude outputs/
